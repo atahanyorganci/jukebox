@@ -12,7 +12,6 @@ module.exports = {
     },
     settings: {},
     extends: [
-        "plugin:react/recommended",
         "plugin:@typescript-eslint/recommended",
         "prettier/@typescript-eslint",
         "plugin:prettier/recommended",
@@ -22,7 +21,10 @@ module.exports = {
         "no-eval": "error",
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
-        "react/react-in-jsx-scope": "off",
-        "react/prop-types": "off",
+        "no-unused-vars": ["off"],
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            { vars: "all", varsIgnorePattern: "^_" },
+        ],
     },
 };

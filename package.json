@@ -4,8 +4,9 @@
   "description": "BlanketBot is a blanket themed Discord bot.",
   "main": "dist/bot.js",
   "scripts": {
-    "compile": "npx tsc",
-    "start": "npm run compile && node dist/bot.js"
+    "lint": "npx eslint --fix src/**/*.ts",
+    "build": "npx tsc",
+    "start": "npm run build && node dist/bot.js"
   },
   "keywords": [],
   "author": "Atahan Yorgancı",
