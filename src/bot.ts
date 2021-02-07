@@ -1,8 +1,10 @@
 import * as dotenv from "dotenv";
 import { Client } from "discord.js";
 import * as winston from "winston";
+import { CommandHandlerBuilder } from "./command";
+import infoCommand, { infoDescription } from "./command/info";
 
-const { BOT_TOKEN, LOG_FILE } = dotenv.config().parsed;
+export const { PREFIX, BOT_TOKEN, LOG_FILE } = dotenv.config().parsed;
 
 const { combine, timestamp, printf, colorize } = winston.format;
 
@@ -12,7 +14,7 @@ const myFormat = printf(({ level, message, timestamp }) => {
 
 const colorizer = colorize();
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
     format: combine(
         timestamp({ format: "YYYY/MM/DD HH:mm:ss" }),
         myFormat,
@@ -29,8 +31,15 @@ const logger = winston.createLogger({
     ],
 });
 
-const client = new Client();
-client.once("ready", () => {
+const handler = new CommandHandlerBuilder()
+    .register("info", infoCommand, { description: infoDescription })
+    .build();
+
+export const bot = new Client();
+bot.once("ready", () => {
     logger.info("Bot is ready.");
 });
-client.login(BOT_TOKEN);
+bot.on("message", msg => {
+    handler.handle(msg);
+});
+bot.login(BOT_TOKEN);
