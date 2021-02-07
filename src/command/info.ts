@@ -2,9 +2,12 @@ import { Message, MessageEmbed } from "discord.js";
 import { bot } from "../bot";
 import { handlerFunc } from ".";
 
-const infoCommand: handlerFunc = (msg, args) => {
+const infoCommand: handlerFunc = async (msg, args) => {
     const [arg, ...rest] = args;
-    if (rest.length !== 0) return sendErrorMessage(msg);
+    if (rest.length !== 0) {
+        await sendErrorMessage(msg);
+        return;
+    }
 
     if (arg === "bot") {
         const icon = bot.user.displayAvatarURL();
@@ -14,7 +17,7 @@ const infoCommand: handlerFunc = (msg, args) => {
             .setThumbnail(icon)
             .addField("Bot Name:", bot.user.username)
             .addField("Created On", bot.user.createdAt);
-        return msg.channel.send(response);
+        await msg.channel.send(response);
     } else if (arg === "server") {
         const icon = bot.user.displayAvatarURL();
         const response = new MessageEmbed()
@@ -25,13 +28,14 @@ const infoCommand: handlerFunc = (msg, args) => {
             .addField("Created On", msg.guild.createdAt)
             .addField("Total Members", msg.guild.memberCount)
             .addField("You Joined At", msg.member.joinedAt);
-        return msg.channel.send(response);
+        await msg.channel.send(response);
+    } else {
+        await sendErrorMessage(msg);
     }
-    sendErrorMessage(msg);
 };
 
-function sendErrorMessage(msg: Message): Promise<Message> {
-    return msg.channel.send("`!info` takes arguments `bot` or `server`.");
+async function sendErrorMessage(msg: Message): Promise<void> {
+    await msg.channel.send("`!info` takes arguments `bot` or `server`.");
 }
 
 export const infoDescription = "Information about the server or the bot.";

@@ -1,10 +1,7 @@
 import { Message, MessageEmbed } from "discord.js";
 import { logger, PREFIX } from "../bot";
 
-export type handlerFunc = (
-    msg: Message,
-    args: string[]
-) => Promise<Message | Message[]>;
+export type handlerFunc = (msg: Message, args: string[]) => Promise<void>;
 
 export type HandlerOptions = {
     description?: string;
@@ -32,7 +29,7 @@ export class CommandHandler {
         }
     }
 
-    handle(msg: Message): Promise<Message | Message[]> {
+    async handle(msg: Message): Promise<void> {
         const { content, author } = msg;
         if (!content.startsWith(PREFIX) || author.bot) return;
 
@@ -40,11 +37,16 @@ export class CommandHandler {
         logger.info(`Command: "${cmd}" Args: ${args}`);
 
         const handler = this.handlers.get(cmd.toLocaleLowerCase());
-        if (handler) return handler(msg, args);
-        this.helpCommand(msg, `Invalid command \`${PREFIX}${cmd}\``);
+
+        try {
+            if (handler) return handler(msg, args);
+            this.helpCommand(msg, `Invalid command \`${PREFIX}${cmd}\``);
+        } catch (error) {
+            logger.error(`${error} occured while handling ${cmd}`);
+        }
     }
 
-    helpCommand(msg: Message, error?: string) {
+    async helpCommand(msg: Message, error?: string): Promise<void> {
         const response = new MessageEmbed()
             .setTitle("Available Commands")
             .setColor("#123123");
@@ -52,7 +54,8 @@ export class CommandHandler {
         this.descriptions.forEach((description, command) =>
             response.addField(`\`${PREFIX}${command}\``, description)
         );
-        return msg.channel.send(response);
+
+        await msg.channel.send(response);
     }
 }
 
