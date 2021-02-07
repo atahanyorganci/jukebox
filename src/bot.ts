@@ -4,9 +4,9 @@ import * as winston from "winston";
 
 const { BOT_TOKEN, LOG_FILE } = dotenv.config().parsed;
 
-const { combine, timestamp, label, printf, colorize } = winston.format;
+const { combine, timestamp, printf, colorize } = winston.format;
 
-const myFormat = printf(({ level, message, label, timestamp }) => {
+const myFormat = printf(({ level, message, timestamp }) => {
     return `${level.toUpperCase()}: ${timestamp}: ${message}`;
 });
 
