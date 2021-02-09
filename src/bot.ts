@@ -3,28 +3,20 @@ import { Client } from "discord.js";
 import * as winston from "winston";
 import { DispactherBuilder } from "./commands";
 import InfoCommand from "./commands/info";
+import { SearchVideoCommand } from "./commands/music";
 
-export const { PREFIX, BOT_TOKEN, LOG_FILE } = dotenv.config().parsed;
+export const { PREFIX, BOT_TOKEN, LOG_FILE, API_KEY } = dotenv.config().parsed;
 
 const { combine, timestamp, printf, colorize } = winston.format;
-
 const myFormat = printf(({ level, message, timestamp }) => {
-    return `${level.toUpperCase()}: ${timestamp}: ${message}`;
+    const level_str = colorizer.colorize(level, `[${level.toUpperCase()}]:`);
+    return `${level_str} ${timestamp}: ${message}`;
 });
 
 const colorizer = colorize();
 
 export const logger = winston.createLogger({
-    format: combine(
-        timestamp({ format: "YYYY/MM/DD HH:mm:ss" }),
-        myFormat,
-        printf(msg =>
-            colorizer.colorize(
-                msg.level,
-                `[${msg.level.toUpperCase()}] ${msg.timestamp}: ${msg.message}`
-            )
-        )
-    ),
+    format: combine(timestamp({ format: "YYYY/MM/DD HH:mm:ss" }), myFormat),
     transports: [
         new winston.transports.Console(),
         new winston.transports.File({ filename: LOG_FILE }),
@@ -32,7 +24,10 @@ export const logger = winston.createLogger({
 });
 
 export const bot = new Client();
-const handler = new DispactherBuilder().register(new InfoCommand()).build();
+const handler = new DispactherBuilder()
+    .register(new InfoCommand())
+    .register(new SearchVideoCommand())
+    .build();
 bot.once("ready", () => {
     logger.info("Bot is ready.");
 });
