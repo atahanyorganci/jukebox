@@ -1,8 +1,8 @@
 import * as dotenv from "dotenv";
 import { Client } from "discord.js";
 import * as winston from "winston";
-import { CommandHandlerBuilder } from "./command";
-import infoCommand, { infoDescription } from "./command/info";
+import { DispactherBuilder } from "./commands";
+import InfoCommand from "./commands/info";
 
 export const { PREFIX, BOT_TOKEN, LOG_FILE } = dotenv.config().parsed;
 
@@ -31,15 +31,10 @@ export const logger = winston.createLogger({
     ],
 });
 
-const handler = new CommandHandlerBuilder()
-    .register("info", infoCommand, { description: infoDescription })
-    .build();
-
 export const bot = new Client();
+const handler = new DispactherBuilder().register(new InfoCommand()).build();
 bot.once("ready", () => {
     logger.info("Bot is ready.");
 });
-bot.on("message", msg => {
-    handler.handle(msg);
-});
+bot.on("message", msg => handler.handle(bot, msg));
 bot.login(BOT_TOKEN);
