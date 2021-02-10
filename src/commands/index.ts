@@ -77,7 +77,12 @@ export class CommandDispacther {
         if (!content.startsWith(PREFIX) || author.bot) return;
 
         const [cmd, ...args] = content.slice(PREFIX.length).trim().split(/ +/);
-        logger.info(`Command: "${cmd}" Args: ${args}`);
+
+        if (args.length !== 0) {
+            logger.info(`Recived command "${cmd}" with [${args.join(", ")}]`);
+        } else {
+            logger.info(`Recived command "${cmd}"`);
+        }
 
         const command =
             this.commands.get(cmd.toLocaleLowerCase()) ||
