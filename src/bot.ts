@@ -3,7 +3,16 @@ import { Client } from "discord.js";
 import * as winston from "winston";
 import { DispactherBuilder } from "./commands";
 import InfoCommand from "./commands/info";
-import { PlayCommand, SearchVideoCommand } from "./commands/music";
+import {
+    PlayCommand,
+    SearchVideoCommand,
+    ResumeCommand,
+    PauseCommand,
+    NowPlayingCommand,
+    QueueCommand,
+    SkipCommand,
+    VolumeCommand,
+} from "./commands/music";
 
 export const { PREFIX, BOT_TOKEN, LOG_FILE, API_KEY } = dotenv.config().parsed;
 
@@ -25,8 +34,14 @@ export const logger = winston.createLogger({
 export const bot = new Client();
 const handler = new DispactherBuilder()
     .register(new InfoCommand())
-    .register(new SearchVideoCommand())
+    .register(new NowPlayingCommand())
+    .register(new PauseCommand())
     .register(new PlayCommand())
+    .register(new QueueCommand())
+    .register(new ResumeCommand())
+    .register(new SearchVideoCommand())
+    .register(new SkipCommand())
+    .register(new VolumeCommand())
     .build();
 bot.once("ready", () => {
     logger.info("Bot is ready.");

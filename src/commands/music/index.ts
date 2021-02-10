@@ -8,8 +8,14 @@ import { google } from "googleapis";
 import ytdl from "ytdl-core";
 import { API_KEY, logger } from "../../bot";
 
-export { SearchVideoCommand } from "./search";
+export { NowPlayingCommand } from "./nowPlaying";
+export { PauseCommand } from "./pause";
 export { PlayCommand } from "./play";
+export { QueueCommand } from "./queue";
+export { ResumeCommand } from "./resume";
+export { SearchVideoCommand } from "./search";
+export { SkipCommand } from "./skip";
+export { VolumeCommand } from "./volume";
 
 export const youtube = google.youtube("v3");
 
@@ -67,7 +73,7 @@ export class Video {
 }
 
 export class MusicQueue {
-    private queue: Video[] = [];
+    queue: Video[] = [];
     dispatcher: StreamDispatcher | null = null;
     channel: VoiceChannel | null = null;
     connection: VoiceConnection | null = null;
@@ -83,7 +89,7 @@ export class MusicQueue {
     async joinChannel(channel: VoiceChannel): Promise<void> {
         if (this.channel) this.channel.leave();
         this.channel = channel;
-        logger.info(`Connected to channel "${this.connection.channel.name}"`);
+        logger.info(`Connected to channel "${channel.name}"`);
     }
 
     async leaveChannel(): Promise<void> {
@@ -101,14 +107,24 @@ export class MusicQueue {
         });
         this.connection = await this.channel.join();
         this.dispatcher = this.connection.play(stream);
-        this.dispatcher.on("finish", () => {
+        this.dispatcher.on("finish", this.nextSong);
+    }
+
+    async nextSong() {
+        if (this.queue) {
             this.queue.splice(0, 1);
-            if (this.queue.length !== 0) {
-                this.playFromQueue();
-            } else {
-                this.leaveChannel();
-            }
-        });
+        } else {
+            this.queue = [];
+        }
+        if (this.queue.length !== 0) {
+            await this.playFromQueue();
+        } else {
+            await this.leaveChannel();
+        }
+    }
+
+    get nowPlaying() {
+        return this.queue[0];
     }
 }
 
