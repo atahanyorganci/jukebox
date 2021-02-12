@@ -14,7 +14,20 @@ import {
     VolumeCommand,
 } from "./commands/music";
 
-export const { PREFIX, BOT_TOKEN, LOG_FILE, API_KEY } = dotenv.config().parsed;
+interface BotConfig {
+    PREFIX: string;
+    BOT_TOKEN: string;
+    LOG_FILE: string;
+    API_KEY: string;
+}
+
+const { parsed } = dotenv.config();
+export const {
+    PREFIX,
+    BOT_TOKEN,
+    LOG_FILE,
+    API_KEY,
+} = (parsed as unknown) as BotConfig;
 
 const { combine, timestamp, printf, colorize } = winston.format;
 const myFormat = printf(({ level, message, timestamp }) => {
