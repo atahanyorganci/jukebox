@@ -109,6 +109,28 @@ export class JukeBox {
         }
     }
 
+    async clear(): Promise<"success" | "error"> {
+        this._queue = [];
+        try {
+            await this.onSongFinish();
+            return "success";
+        } catch (error) {
+            logger.error(`${error} occured when playing song.`);
+            return "error";
+        }
+    }
+
+    async remove(index: number): Promise<Video | null> {
+        try {
+            const video = this.queue.splice(index, 1);
+            if (index === 0) await this.onSongFinish();
+            return video[0];
+        } catch (error) {
+            logger.error(`${error} occured when playing song.`);
+            return null;
+        }
+    }
+
     private async playFromQueue() {
         if (!this.channel) return;
         const stream = ytdl(this.queue[0].url, {
@@ -132,7 +154,9 @@ export class JukeBox {
             try {
                 await this.leaveChannel();
             } catch (error) {
-                logger.error(`${error} occured when playing next song.`);
+                logger.error(
+                    `"${error}" occured while leaving the voice channel.`
+                );
             }
             musician.delete(this._guildId);
             return "end";

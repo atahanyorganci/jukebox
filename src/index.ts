@@ -1,11 +1,13 @@
 import { Client } from "discord.js";
 import * as winston from "winston";
 import { DispactherBuilder } from "./commands";
+import { ClearCommand } from "./commands/clear";
 import { InfoCommand } from "./commands/info";
 import { NowPlayingCommand } from "./commands/nowPlaying";
 import { PauseCommand } from "./commands/pause";
 import { PlayCommand } from "./commands/play";
 import { QueueCommand } from "./commands/queue";
+import { RemoveCommand } from "./commands/remove";
 import { ResumeCommand } from "./commands/resume";
 import { SearchVideoCommand } from "./commands/search";
 import { SkipCommand } from "./commands/skip";
@@ -28,11 +30,13 @@ export const logger = winston.createLogger({
 
 export const bot = new Client();
 const handler = new DispactherBuilder()
+    .register(new ClearCommand())
     .register(new InfoCommand())
     .register(new NowPlayingCommand())
     .register(new PauseCommand())
     .register(new PlayCommand())
     .register(new QueueCommand())
+    .register(new RemoveCommand())
     .register(new ResumeCommand())
     .register(new SearchVideoCommand())
     .register(new SkipCommand())
