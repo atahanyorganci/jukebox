@@ -1,4 +1,3 @@
-import * as dotenv from "dotenv";
 import { Client } from "discord.js";
 import * as winston from "winston";
 import { DispactherBuilder } from "./commands";
@@ -11,21 +10,9 @@ import { ResumeCommand } from "./commands/resume";
 import { SearchVideoCommand } from "./commands/search";
 import { SkipCommand } from "./commands/skip";
 import { VolumeCommand } from "./commands/volume";
+import config from "./config";
 
-interface BotConfig {
-    PREFIX: string;
-    BOT_TOKEN: string;
-    LOG_FILE: string;
-    API_KEY: string;
-}
-
-const { parsed } = dotenv.config();
-export const {
-    PREFIX,
-    BOT_TOKEN,
-    LOG_FILE,
-    API_KEY,
-} = (parsed as unknown) as BotConfig;
+export const { BOT_TOKEN, API_KEY, PREFIX } = config();
 
 const { combine, timestamp, printf, colorize } = winston.format;
 const myFormat = printf(({ level, message, timestamp }) => {
@@ -36,10 +23,7 @@ const myFormat = printf(({ level, message, timestamp }) => {
 
 export const logger = winston.createLogger({
     format: combine(timestamp({ format: "YYYY/MM/DD HH:mm:ss" }), myFormat),
-    transports: [
-        new winston.transports.Console(),
-        new winston.transports.File({ filename: LOG_FILE }),
-    ],
+    transports: [new winston.transports.Console()],
 });
 
 export const bot = new Client();
