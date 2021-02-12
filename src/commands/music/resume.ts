@@ -17,13 +17,20 @@ export class ResumeCommand extends Command {
                 "Resume command doesn't require arguments!"
             );
         }
-        if (musician.streaming) {
+        const jukebox = musician.get(message.guild.id);
+
+        if (!jukebox) {
+            await message.channel.send("Queue is empty!");
+            return;
+        }
+
+        if (jukebox.streaming) {
             await message.channel.send("Bot is currently playing.");
             return;
         }
 
         const errorMessage =
-            "You need to be in the same voice channel with the bot to resume the musician!";
+            "You need to be in the same voice channel with the bot to resume!";
         // User should be in a voice channel
         if (!message.member.voice.channel) {
             await message.channel.send(errorMessage);
@@ -33,12 +40,12 @@ export class ResumeCommand extends Command {
         const voiceChannel = message.member.voice.channel;
 
         // User should be in the same channel with the bot
-        if (musician.channel !== voiceChannel && musician.channel) {
+        if (jukebox.channel !== voiceChannel && jukebox.channel) {
             await message.channel.send(errorMessage);
             return;
         }
 
-        musician.dispatcher.resume();
+        jukebox.dispatcher.resume();
 
         logger.info("Streaming resumed.");
         await message.channel.send("Streaming resumed.");

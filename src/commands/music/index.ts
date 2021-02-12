@@ -1,4 +1,5 @@
 import {
+    Message,
     MessageEmbed,
     StreamDispatcher,
     VoiceChannel,
@@ -72,60 +73,159 @@ export class Video {
     }
 }
 
-export class MusicQueue {
-    queue: Video[] = [];
-    dispatcher: StreamDispatcher | null = null;
-    channel: VoiceChannel | null = null;
-    connection: VoiceConnection | null = null;
+export class JukeBox {
+    private _guildId: string;
+    private _queue: Video[] = [];
+    private _dispatcher: StreamDispatcher | null = null;
+    private _channel: VoiceChannel | null = null;
+    private _connection: VoiceConnection | null = null;
+    private _volume = 1;
+
+    constructor(guildId: string) {
+        this._guildId = guildId;
+    }
 
     public get streaming(): boolean {
-        return this.dispatcher !== null && !this.dispatcher.paused;
+        return this._dispatcher !== null && !this._dispatcher.paused;
     }
 
-    enqueue(video: Video): void {
-        this.queue.push(video);
+    public get channel() {
+        return this._channel;
     }
 
-    async joinChannel(channel: VoiceChannel): Promise<void> {
-        if (this.channel) this.channel.leave();
-        this.channel = channel;
-        logger.info(`Connected to channel "${channel.name}"`);
+    public get queue() {
+        return this._queue;
     }
 
-    async leaveChannel(): Promise<void> {
-        if (!this.channel) return;
-
-        this.channel.leave();
-        this.channel = null;
+    public get connection() {
+        return this._connection;
     }
 
-    async playFromQueue() {
-        if (this.queue.length === 0 || this.channel === null) return;
-
-        const stream = ytdl(this.queue[0].url, {
-            filter: "audioonly",
-        });
-        this.connection = await this.channel.join();
-        this.dispatcher = this.connection.play(stream);
-        this.dispatcher.on("finish", this.nextSong);
+    public get dispatcher() {
+        return this._dispatcher;
     }
 
-    async nextSong() {
-        if (this.queue) {
-            this.queue.splice(0, 1);
-        } else {
-            this.queue = [];
-        }
-        if (this.queue.length !== 0) {
-            await this.playFromQueue();
-        } else {
-            await this.leaveChannel();
-        }
+    public get volume() {
+        return this._volume;
+    }
+
+    public set volume(volume: number) {
+        if (volume < 0 || volume > 100) return;
+        this._volume = volume / 100;
+        if (this.dispatcher) this.dispatcher.setVolume(this._volume);
     }
 
     get nowPlaying() {
-        return this.queue[0];
+        return this._queue[0];
+    }
+
+    private async joinChannel(channel: VoiceChannel): Promise<void> {
+        if (this._channel) this._channel.leave();
+        this._channel = channel;
+        logger.info(`Connected to channel "${channel.name}"`);
+    }
+
+    private async leaveChannel(): Promise<void> {
+        if (!this._channel) return;
+
+        this._channel.leave();
+        this._channel = null;
+    }
+
+    private enqueue(video: Video): void {
+        this._queue.push(video);
+    }
+
+    async play(
+        message: Message,
+        video: Video
+    ): Promise<"play" | "queue" | "error"> {
+        this.enqueue(video);
+        if (this.streaming) {
+            logger.info(`${video.title} is added to the queue.`);
+            return "queue";
+        }
+
+        try {
+            this.joinChannel(message.member.voice.channel);
+            await this.playFromQueue();
+            logger.info(`Streaming ${video.title}.`);
+        } catch (error) {
+            logger.error(`${error} occured when playing song.`);
+            return "error";
+        }
+        return "play";
+    }
+
+    pause(): void {
+        this.dispatcher.pause();
+    }
+
+    resume(): void {
+        this.dispatcher.resume();
+    }
+
+    setVolume(volume: number): void {
+        this.volume = volume;
+    }
+
+    async skip(): Promise<"next" | "end" | "error"> {
+        this.queue.splice(0, 1);
+        try {
+            return this.onSongFinish();
+        } catch (error) {
+            logger.error(`${error} occured when playing song.`);
+            return "error";
+        }
+    }
+
+    private async playFromQueue() {
+        const stream = ytdl(this.queue[0].url, {
+            filter: "audioonly",
+        });
+        this._connection = await this.channel.join();
+        this._dispatcher = this.connection.play(stream);
+        this.dispatcher.setVolume(this.volume);
+
+        this.dispatcher.on("finish", async () => {
+            this.queue.splice(0, 1);
+            await this.onSongFinish();
+        });
+    }
+
+    private async onSongFinish(): Promise<"next" | "end"> {
+        if (this.queue.length === 0) {
+            try {
+                await this.leaveChannel();
+            } catch (error) {
+                logger.error(`${error} occured when playing next song.`);
+            }
+            musician.delete(this._guildId);
+            return "end";
+        } else {
+            await this.playFromQueue();
+            return "next";
+        }
     }
 }
 
-export const musician = new MusicQueue();
+export class Musican {
+    boxes = new Map<string, JukeBox>();
+
+    get(guildId: string): JukeBox | null {
+        const jukebox = this.boxes.get(guildId);
+        return jukebox ? jukebox : null;
+    }
+
+    create(guildId: string): JukeBox {
+        const jukebox = new JukeBox(guildId);
+        this.boxes.set(guildId, jukebox);
+        return jukebox;
+    }
+
+    delete(guildId: string) {
+        this.boxes.delete(guildId);
+    }
+}
+
+export const musician = new Musican();

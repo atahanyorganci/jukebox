@@ -17,12 +17,14 @@ export class NowPlayingCommand extends Command {
                 "Now playing command doesn't require arguments!"
             );
         }
-        if (!musician.streaming) {
+
+        const jukebox = musician.get(msg.guild.id);
+        if (!jukebox || !jukebox.streaming) {
             await msg.channel.send("Bot is not currently playing.");
             return;
         }
 
-        logger.info(`Currently playing ${musician.nowPlaying.title}.`);
-        await msg.channel.send(musician.nowPlaying.toEmbed());
+        logger.info(`Currently playing ${jukebox.nowPlaying.title}.`);
+        await msg.channel.send(jukebox.nowPlaying.toEmbed());
     }
 }

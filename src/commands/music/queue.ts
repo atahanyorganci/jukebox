@@ -16,14 +16,15 @@ export class QueueCommand extends Command {
                 "Now playing command doesn't require arguments!"
             );
         }
-        if (!musician.streaming) {
+        const jukebox = musician.get(msg.guild.id);
+        if (!jukebox || !jukebox.streaming) {
             await msg.channel.send("Bot is not currently playing.");
             return;
         }
 
         let description = "";
-        for (let i = 0; i < musician.queue.length; i++) {
-            const track = musician.queue[i];
+        for (let i = 0; i < jukebox.queue.length; i++) {
+            const track = jukebox.queue[i];
             description = `${description}\n${i + 1}) ${track.title} by ${
                 track.channel
             }`;

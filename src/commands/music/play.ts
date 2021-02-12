@@ -1,7 +1,6 @@
 import { Client, Message } from "discord.js";
 import { musician, query_video } from ".";
 import { Command } from "..";
-import { logger } from "../../bot";
 
 export class PlayCommand extends Command {
     constructor() {
@@ -11,25 +10,25 @@ export class PlayCommand extends Command {
         });
     }
 
-    async run(bot: Client, message: Message, args: string[]): Promise<void> {
+    async run(bot: Client, msg: Message, args: string[]): Promise<void> {
         // User should be in a voice channel
-        if (!message.member.voice.channel) {
-            await message.channel.send("You need to be in a voice channel!");
+        if (!msg.member.voice.channel) {
+            await msg.channel.send("You need to be in a voice channel!");
             return;
         }
 
         // User should provide trackname in arguments
         if (args.length === 0) {
-            await message.channel.send("You need to provide a song name!");
+            await msg.channel.send("You need to provide a song name!");
             return;
         }
 
+        let jukebox = musician.get(msg.guild.id);
+        if (!jukebox) jukebox = musician.create(msg.guild.id);
+
         // User should be in the same channel with the bot
-        if (
-            musician.channel !== message.member.voice.channel &&
-            musician.channel
-        ) {
-            await message.channel.send(
+        if (jukebox.channel && jukebox.channel !== msg.member.voice.channel) {
+            await msg.channel.send(
                 "Bot is currently playing in another channel!"
             );
             return;
@@ -37,27 +36,14 @@ export class PlayCommand extends Command {
 
         try {
             const video = await query_video(args.join(" "));
-            musician.enqueue(video);
-
-            if (musician.streaming) {
-                logger.info(`${video.title} is added to the queue.`);
-                await message.channel.send(
-                    `${video.title} is added to the queue.`
-                );
-            } else {
-                musician.joinChannel(message.member.voice.channel);
-                musician.playFromQueue();
-
-                logger.info(`Streaming ${video.title}.`);
-                await message.channel.send(video.toEmbed("Currently playing"));
+            const result = await jukebox.play(msg, video);
+            if (result === "play") {
+                await msg.channel.send(video.toEmbed("Currently playing"));
+            } else if (result === "queue") {
+                await msg.channel.send(`${video.title} is added to the queue.`);
             }
         } catch (error) {
-            logger.error("Error occured when joining channel.");
-            logger.error(error);
-            await message.channel.send(
-                "An error occured while joining your channel."
-            );
-            return;
+            await msg.channel.send("An error occured playing a song.");
         }
     }
 }

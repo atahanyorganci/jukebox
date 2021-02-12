@@ -17,7 +17,9 @@ export class PauseCommand extends Command {
                 "Pause command doesn't require arguments!"
             );
         }
-        if (!musician.streaming) {
+
+        const jukebox = musician.get(message.guild.id);
+        if (!jukebox || !jukebox.streaming) {
             await message.channel.send("Bot is not currently playing.");
             return;
         }
@@ -33,12 +35,12 @@ export class PauseCommand extends Command {
         const voiceChannel = message.member.voice.channel;
 
         // User should be in the same channel with the bot
-        if (musician.channel !== voiceChannel && musician.channel) {
+        if (jukebox.channel !== voiceChannel && jukebox.channel) {
             await message.channel.send(errorMessage);
             return;
         }
 
-        musician.dispatcher.pause();
+        jukebox.dispatcher.pause();
 
         logger.info("Streaming paused.");
         await message.channel.send("Streaming paused.");

@@ -15,7 +15,9 @@ export class SkipCommand extends Command {
         if (args.length !== 0) {
             await msg.channel.send("Skip command doesn't require arguments!");
         }
-        if (!musician.streaming) {
+
+        const jukebox = musician.get(msg.guild.id);
+        if (!jukebox || !jukebox.streaming) {
             await msg.channel.send("Bot is not currently playing.");
             return;
         }
@@ -31,14 +33,24 @@ export class SkipCommand extends Command {
         const voiceChannel = msg.member.voice.channel;
 
         // User should be in the same channel with the bot
-        if (musician.channel !== voiceChannel && musician.channel) {
+        if (jukebox.channel !== voiceChannel && jukebox.channel) {
             await msg.channel.send(errorMessage);
             return;
         }
 
-        musician.nextSong();
-
-        logger.info("Skipping track.");
-        await msg.channel.send("Skipping track.");
+        try {
+            const result = await jukebox.skip();
+            if (result === "next") {
+                await msg.channel.send(
+                    jukebox.nowPlaying.toEmbed("Skipped and currently playing")
+                );
+            } else if (result === "error") {
+                await msg.channel.send(
+                    "An error occurred while skipping the song."
+                );
+            }
+        } catch (error) {
+            logger.error(`${error} occurred while handling skip command`);
+        }
     }
 }
