@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
-import { query_video } from ".";
-import { Command } from "..";
+import { Command } from ".";
+import { query_video } from "../music";
 
 export class SearchVideoCommand extends Command {
     constructor() {

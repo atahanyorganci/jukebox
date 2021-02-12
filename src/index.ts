@@ -2,17 +2,15 @@ import * as dotenv from "dotenv";
 import { Client } from "discord.js";
 import * as winston from "winston";
 import { DispactherBuilder } from "./commands";
-import InfoCommand from "./commands/info";
-import {
-    PlayCommand,
-    SearchVideoCommand,
-    ResumeCommand,
-    PauseCommand,
-    NowPlayingCommand,
-    QueueCommand,
-    SkipCommand,
-    VolumeCommand,
-} from "./commands/music";
+import { InfoCommand } from "./commands/info";
+import { NowPlayingCommand } from "./commands/nowPlaying";
+import { PauseCommand } from "./commands/pause";
+import { PlayCommand } from "./commands/play";
+import { QueueCommand } from "./commands/queue";
+import { ResumeCommand } from "./commands/resume";
+import { SearchVideoCommand } from "./commands/search";
+import { SkipCommand } from "./commands/skip";
+import { VolumeCommand } from "./commands/volume";
 
 interface BotConfig {
     PREFIX: string;

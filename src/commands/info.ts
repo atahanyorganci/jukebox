@@ -1,7 +1,7 @@
 import { Client, Message, MessageEmbed } from "discord.js";
 import { Command } from ".";
 
-class InfoCommand extends Command {
+export class InfoCommand extends Command {
     constructor() {
         super({
             name: "info",
@@ -46,5 +46,3 @@ class InfoCommand extends Command {
         await msg.channel.send("`!info` takes arguments `bot` or `server`.");
     }
 }
-
-export default InfoCommand;

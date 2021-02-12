@@ -1,5 +1,5 @@
 import { Client, Message, MessageEmbed } from "discord.js";
-import { logger, PREFIX } from "../bot";
+import { logger, PREFIX } from "..";
 
 export interface CommandOptions {
     name: string;

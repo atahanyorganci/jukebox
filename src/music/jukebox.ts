@@ -1,76 +1,7 @@
-import {
-    MessageEmbed,
-    StreamDispatcher,
-    VoiceChannel,
-    VoiceConnection,
-} from "discord.js";
-import { google } from "googleapis";
+import { StreamDispatcher, VoiceChannel, VoiceConnection } from "discord.js";
 import ytdl from "ytdl-core";
-import { API_KEY, logger } from "../../bot";
-
-export { NowPlayingCommand } from "./nowPlaying";
-export { PauseCommand } from "./pause";
-export { PlayCommand } from "./play";
-export { QueueCommand } from "./queue";
-export { ResumeCommand } from "./resume";
-export { SearchVideoCommand } from "./search";
-export { SkipCommand } from "./skip";
-export { VolumeCommand } from "./volume";
-
-export const youtube = google.youtube("v3");
-
-export async function query_video(query: string): Promise<Video> {
-    const list = await youtube.search.list({
-        auth: API_KEY,
-        part: ["id", "snippet"],
-        maxResults: 1,
-        q: query,
-    });
-    const { id, snippet } = list.data.items[0];
-    const { channelTitle, title, description, thumbnails } = snippet;
-
-    return new Video(
-        id.videoId,
-        title,
-        description,
-        channelTitle,
-        thumbnails.default.url
-    );
-}
-export class Video {
-    id: string;
-    title: string;
-    description: string;
-    channel: string;
-    thumbnail: string;
-
-    constructor(
-        id: string,
-        title: string,
-        description: string,
-        channel: string,
-        thumbnail: string
-    ) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.channel = channel;
-        this.thumbnail = thumbnail;
-    }
-
-    get url(): string {
-        return `https://www.youtube.com/watch?v=${this.id}`;
-    }
-
-    toEmbed(prefix?: string) {
-        const title = prefix ? `${prefix} - ${this.title}` : this.title;
-        return new MessageEmbed()
-            .setTitle(title)
-            .setDescription(this.description)
-            .addField("Channel", this.channel)
-            .setImage(this.thumbnail);
-    }
-}
+import { Video, musician } from ".";
+import { logger } from "..";
 
 export class JukeBox {
     private _guildId: string;
@@ -211,24 +142,3 @@ export class JukeBox {
         }
     }
 }
-
-export class Musican {
-    boxes = new Map<string, JukeBox>();
-
-    get(guildId: string): JukeBox | null {
-        const jukebox = this.boxes.get(guildId);
-        return jukebox ? jukebox : null;
-    }
-
-    create(guildId: string): JukeBox {
-        const jukebox = new JukeBox(guildId);
-        this.boxes.set(guildId, jukebox);
-        return jukebox;
-    }
-
-    delete(guildId: string) {
-        this.boxes.delete(guildId);
-    }
-}
-
-export const musician = new Musican();
