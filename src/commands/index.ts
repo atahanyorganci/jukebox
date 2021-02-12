@@ -92,8 +92,9 @@ export class CommandDispacther {
             if (command) {
                 command.run(bot, msg, args);
             } else {
-                const helpCommand = this.commands.get("help");
-                helpCommand.run(bot, msg, ["Invalid command."]);
+                const help = this.commands.get("help");
+                if (help) help.run(bot, msg, ["Invalid command."]);
+                else logger.error("Help command is not registered.");
             }
         } catch (error) {
             logger.error(`${error} occured while handling ${cmd}`);
