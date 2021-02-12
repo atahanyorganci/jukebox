@@ -36,7 +36,7 @@ export class PlayCommand extends Command {
 
         try {
             const video = await query_video(args.join(" "));
-            const result = await jukebox.play(msg, video);
+            const result = await jukebox.play(msg.member.voice.channel, video);
             if (result === "play") {
                 await msg.channel.send(video.toEmbed("Currently playing"));
             } else if (result === "queue") {

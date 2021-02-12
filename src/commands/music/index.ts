@@ -1,5 +1,4 @@
 import {
-    Message,
     MessageEmbed,
     StreamDispatcher,
     VoiceChannel,
@@ -137,7 +136,7 @@ export class JukeBox {
     }
 
     async play(
-        message: Message,
+        channel: VoiceChannel,
         video: Video
     ): Promise<"play" | "queue" | "error"> {
         this.enqueue(video);
@@ -147,7 +146,7 @@ export class JukeBox {
         }
 
         try {
-            this.joinChannel(message.member.voice.channel);
+            this.joinChannel(channel);
             await this.playFromQueue();
             logger.info(`Streaming ${video.title}.`);
         } catch (error) {
@@ -158,11 +157,11 @@ export class JukeBox {
     }
 
     pause(): void {
-        this.dispatcher.pause();
+        if (this.dispatcher) this.dispatcher.pause();
     }
 
     resume(): void {
-        this.dispatcher.resume();
+        if (this.dispatcher) this.dispatcher.resume();
     }
 
     setVolume(volume: number): void {
@@ -180,17 +179,21 @@ export class JukeBox {
     }
 
     private async playFromQueue() {
+        if (!this.channel) return;
         const stream = ytdl(this.queue[0].url, {
             filter: "audioonly",
         });
-        this._connection = await this.channel.join();
-        this._dispatcher = this.connection.play(stream);
-        this.dispatcher.setVolume(this.volume);
+        const connection = await this.channel.join();
+        const dispatcher = connection.play(stream);
+        dispatcher.setVolume(this.volume);
 
-        this.dispatcher.on("finish", async () => {
+        dispatcher.on("finish", async () => {
             this.queue.splice(0, 1);
             await this.onSongFinish();
         });
+
+        this._connection = connection;
+        this._dispatcher = dispatcher;
     }
 
     private async onSongFinish(): Promise<"next" | "end"> {
