@@ -1,7 +1,7 @@
 import { Client } from "discord.js";
 import * as winston from "winston";
 import { DispactherBuilder } from "./commands";
-import { ClearCommand } from "./commands/clear";
+import { StopCommand } from "./commands/stop";
 import { InfoCommand } from "./commands/info";
 import { NowPlayingCommand } from "./commands/nowPlaying";
 import { PauseCommand } from "./commands/pause";
@@ -30,7 +30,7 @@ export const logger = winston.createLogger({
 
 export const bot = new Client();
 const handler = new DispactherBuilder()
-    .register(new ClearCommand())
+    .register(new StopCommand())
     .register(new InfoCommand())
     .register(new NowPlayingCommand())
     .register(new PauseCommand())

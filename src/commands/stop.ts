@@ -3,17 +3,17 @@ import { Command } from ".";
 import { logger } from "..";
 import { musician } from "../music";
 
-export class ClearCommand extends Command {
+export class StopCommand extends Command {
     constructor() {
         super({
-            name: "clear",
-            description: "Clears song queue.",
+            name: "stop",
+            description: "Stop audio stream, clears queue, and leaves channel.",
         });
     }
 
     async run(bot: Client, msg: Message, args: string[]): Promise<void> {
         if (args.length !== 0) {
-            await msg.channel.send("Clear command doesn't require arguments!");
+            await msg.channel.send("Stop command doesn't require arguments!");
         }
 
         const jukebox = musician.get(msg.guild.id);
@@ -23,7 +23,7 @@ export class ClearCommand extends Command {
         }
 
         const errorMessage =
-            "You need to be in the same voice channel with the bot to clear queue!";
+            "You need to be in the same voice channel with the bot to stop it";
         // User should be in a voice channel
         if (!msg.member.voice.channel) {
             await msg.channel.send(errorMessage);
@@ -41,14 +41,12 @@ export class ClearCommand extends Command {
         try {
             const result = await jukebox.clear();
             if (result === "success") {
-                await msg.channel.send("Cleared song queue.");
+                await msg.channel.send("Stopped streaming.");
             } else if (result === "error") {
-                await msg.channel.send(
-                    "An error occurred while clearing queue."
-                );
+                await msg.channel.send("An error occurred while stopping.");
             }
         } catch (error) {
-            logger.error(`${error} occurred while handling queue command`);
+            logger.error(`${error} occurred while handling stop command`);
         }
     }
 }
