@@ -1,38 +1,42 @@
 {
-  "name": "jukebox",
-  "version": "1.0.0",
-  "description": "JukeBox is a blanket themed Discord bot.",
-  "main": "dist",
-  "scripts": {
-    "lint": "npx eslint --fix src/**/*.ts",
-    "build": "npx tsc",
-    "start": "npm run build && node dist",
-    "bot": "node dist"
-  },
-  "keywords": [
-    "bot",
-    "discord",
-    "music"
-  ],
-  "author": "Atahan Yorgancı",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^14.14.44",
-    "@typescript-eslint/eslint-plugin": "^4.22.1",
-    "@typescript-eslint/parser": "^4.22.1",
-    "eslint": "^7.25.0",
-    "eslint-config-prettier": "^7.2.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "prettier": "^2.2.1",
-    "typescript": "^4.2.4"
-  },
-  "dependencies": {
-    "@discordjs/opus": "^0.4.0",
-    "discord.js": "^12.5.3",
-    "dotenv": "^8.6.0",
-    "ffmpeg-static": "^4.3.0",
-    "googleapis": "^67.1.1",
-    "winston": "^3.3.3",
-    "ytdl-core": "^4.7.0"
-  }
+    "name": "jukebox",
+    "version": "1.0.0",
+    "description": "JukeBox is a blanket themed Discord bot.",
+    "repository": {
+        "url": "https://github.com/atahanyorganci/jukebox.git",
+        "type": "git"
+    },
+    "main": "dist",
+    "scripts": {
+        "lint": "npx eslint --fix src/**/*.ts",
+        "build": "npx tsc",
+        "start": "npm run build && node dist",
+        "bot": "node dist"
+    },
+    "keywords": [
+        "bot",
+        "discord",
+        "music"
+    ],
+    "author": "Atahan Yorgancı",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^14.14.44",
+        "@typescript-eslint/eslint-plugin": "^4.22.1",
+        "@typescript-eslint/parser": "^4.22.1",
+        "eslint": "^7.25.0",
+        "eslint-config-prettier": "^7.2.0",
+        "eslint-plugin-prettier": "^3.4.0",
+        "prettier": "^2.2.1",
+        "typescript": "^4.2.4"
+    },
+    "dependencies": {
+        "@discordjs/opus": "^0.4.0",
+        "discord.js": "^12.5.3",
+        "dotenv": "^8.6.0",
+        "ffmpeg-static": "^4.3.0",
+        "googleapis": "^67.1.1",
+        "winston": "^3.3.3",
+        "ytdl-core": "^4.7.0"
+    }
 }
