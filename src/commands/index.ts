@@ -47,8 +47,10 @@ class HelpCommand extends Command {
     }
 
     async run(bot: Client, msg: Message, args: string[]): Promise<void> {
-        if (args.length === 1 && args[1] === "Invaild command.")
-            this.response.setDescription("Invalid command");
+        if (args.length > 0)
+            this.response.setDescription(
+                "Help command doesn't require arguments"
+            );
         await msg.channel.send(this.response);
     }
 }
@@ -92,9 +94,7 @@ export class CommandDispacther {
             if (command) {
                 command.run(bot, msg, args);
             } else {
-                const help = this.commands.get("help");
-                if (help) help.run(bot, msg, ["Invalid command."]);
-                else logger.error("Help command is not registered.");
+                this.sendUnknownCommandMessage(cmd, msg);
             }
         } catch (error) {
             logger.error(`${error} occured while handling ${cmd}`);
@@ -103,6 +103,12 @@ export class CommandDispacther {
 
     registerHelpCommand(): void {
         this.register(new HelpCommand(this.commands));
+    }
+
+    async sendUnknownCommandMessage(cmd: string, msg: Message): Promise<void> {
+        await msg.channel.send(
+            `\`${PREFIX}${cmd}\` is not a valid command, use \`${PREFIX}help\` to view available commands.`
+        );
     }
 }
 
