@@ -1,6 +1,6 @@
 import { Client } from "discord.js";
 import * as winston from "winston";
-import { DispactherBuilder } from "./commands";
+import { DispatcherBuilder } from "./commands";
 import { StopCommand } from "./commands/stop";
 import { InfoCommand } from "./commands/info";
 import { NowPlayingCommand } from "./commands/nowPlaying";
@@ -29,7 +29,8 @@ export const logger = winston.createLogger({
 });
 
 export const bot = new Client();
-const handler = new DispactherBuilder()
+
+const handler = new DispatcherBuilder()
     .register(new StopCommand())
     .register(new InfoCommand())
     .register(new NowPlayingCommand())

@@ -55,7 +55,7 @@ class HelpCommand extends Command {
     }
 }
 
-export class CommandDispacther {
+export class CommandDispatcher {
     commands: Map<string, Command>;
     aliases: Map<string, Command>;
 
@@ -112,19 +112,19 @@ export class CommandDispacther {
     }
 }
 
-export class DispactherBuilder {
-    commandHandler: CommandDispacther;
+export class DispatcherBuilder {
+    commandHandler: CommandDispatcher;
 
     constructor() {
-        this.commandHandler = new CommandDispacther();
+        this.commandHandler = new CommandDispatcher();
     }
 
-    register(command: Command): DispactherBuilder {
+    register(command: Command): DispatcherBuilder {
         this.commandHandler.register(command);
         return this;
     }
 
-    build(): CommandDispacther {
+    build(): CommandDispatcher {
         this.commandHandler.registerHelpCommand();
         return this.commandHandler;
     }
