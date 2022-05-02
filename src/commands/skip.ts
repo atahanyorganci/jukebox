@@ -41,9 +41,10 @@ export class SkipCommand extends Command {
         try {
             const result = await jukebox.skip();
             if (result === "next") {
-                await msg.channel.send(
-                    jukebox.nowPlaying.toEmbed("Skipped and currently playing")
+                const embed = jukebox.nowPlaying.toEmbed(
+                    "Skipped and currently playing"
                 );
+                await msg.channel.send({ embeds: [embed] });
             } else if (result === "error") {
                 await msg.channel.send(
                     "An error occurred while skipping the song."

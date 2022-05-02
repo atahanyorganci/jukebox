@@ -25,18 +25,25 @@ export class InfoCommand extends Command {
                 .setColor("#123123")
                 .setThumbnail(icon)
                 .addField("Bot Name:", bot.user.username)
-                .addField("Created On", bot.user.createdAt);
-            await channel.send(response);
+                .addField(
+                    "Created On",
+                    bot.user.createdAt.toLocaleDateString()
+                );
+            await channel.send({ embeds: [response] });
         } else if (arg === "server" && guild && member) {
+            const joinedAt = member.joinedAt.toLocaleDateString();
+            const createdAt = guild.createdAt.toLocaleDateString();
+            const memberCount = guild.memberCount.toString();
+
             const response = new MessageEmbed()
                 .setDescription("Server Information")
                 .setColor("#123123")
                 .addField("Server Name:", guild.name)
-                .addField("Created On", guild.createdAt)
-                .addField("Total Members", guild.memberCount)
-                .addField("You Joined At", member.joinedAt);
+                .addField("Created On", createdAt)
+                .addField("Member count", memberCount)
+                .addField("You Joined At", joinedAt);
             if (guild.icon) response.setThumbnail(guild.icon);
-            await channel.send(response);
+            await channel.send({ embeds: [response] });
         } else {
             await this.sendErrorMessage(msg);
         }

@@ -50,9 +50,9 @@ export class VolumeCommand extends Command {
             await msg.channel.send(`Volume set to ${volume}%.`);
             logger.info(`Volume set to ${volume}%.`);
         } catch (error) {
-            logger.error("Error occured when joining channel.");
+            logger.error("Error occurred when joining channel.");
             await msg.channel.send(
-                "An error occured while joining your channel."
+                "An error occurred while joining your channel."
             );
             return;
         }

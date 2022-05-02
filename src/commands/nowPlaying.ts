@@ -25,6 +25,7 @@ export class NowPlayingCommand extends Command {
         }
 
         logger.info(`Currently playing ${jukebox.nowPlaying.title}.`);
-        await msg.channel.send(jukebox.nowPlaying.toEmbed());
+        const embed = jukebox.nowPlaying.toEmbed();
+        await msg.channel.send({ embeds: [embed] });
     }
 }

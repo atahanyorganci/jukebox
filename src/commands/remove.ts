@@ -49,7 +49,8 @@ export class RemoveCommand extends Command {
         try {
             const video = await jukebox.remove(index);
             if (video) {
-                await msg.channel.send(video.toEmbed("Removed"));
+                const embed = video.toEmbed("Removed");
+                await msg.channel.send({ embeds: [embed] });
             } else {
                 await msg.channel.send(
                     "An error occurred while removing the song."

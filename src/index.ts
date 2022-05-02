@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, Intents } from "discord.js";
 import * as winston from "winston";
 import { DispatcherBuilder } from "./commands";
 import { StopCommand } from "./commands/stop";
@@ -28,7 +28,13 @@ export const logger = winston.createLogger({
     transports: [new winston.transports.Console()],
 });
 
-export const bot = new Client();
+export const bot = new Client({
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_VOICE_STATES,
+    ],
+});
 
 const handler = new DispatcherBuilder()
     .register(new StopCommand())
@@ -46,5 +52,7 @@ const handler = new DispatcherBuilder()
 bot.once("ready", () => {
     logger.info("Bot is ready.");
 });
-bot.on("message", msg => handler.handle(bot, msg));
+bot.on("messageCreate", msg => {
+    handler.handle(bot, msg);
+});
 bot.login(BOT_TOKEN);

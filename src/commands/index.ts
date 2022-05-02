@@ -42,7 +42,7 @@ class HelpCommand extends Command {
             if (description)
                 response.addField(`\`${PREFIX}${name}\``, description);
         });
-        response.addField(`\`${PREFIX}${this.name}\``, this.description);
+        response.addField(`\`${PREFIX}${this.name}\``, this.description || "");
         return response;
     }
 
@@ -51,7 +51,7 @@ class HelpCommand extends Command {
             this.response.setDescription(
                 "Help command doesn't require arguments"
             );
-        await msg.channel.send(this.response);
+        await msg.channel.send({ embeds: [this.response] });
     }
 }
 

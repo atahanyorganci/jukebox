@@ -34,6 +34,6 @@ export class QueueCommand extends Command {
             .setDescription(description)
             .setColor("#123123");
 
-        await msg.channel.send(embed);
+        await msg.channel.send({ embeds: [embed] });
     }
 }

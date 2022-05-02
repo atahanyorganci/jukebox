@@ -14,6 +14,7 @@ export class SearchVideoCommand extends Command {
     async run(bot: Client, msg: Message, args: string[]): Promise<void> {
         const videoName = args.join(" ");
         const video = await queryVideo(videoName);
-        msg.channel.send(video.toEmbed());
+        const embed = video.toEmbed();
+        msg.channel.send({ embeds: [embed] });
     }
 }
