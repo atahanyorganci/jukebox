@@ -1,6 +1,8 @@
 import { Client, Message } from "discord.js";
 import { Command } from "@commands";
-import { musician, queryVideo } from "../music";
+import { queryVideo, videoToEmbed } from "@music";
+import JukeBox from "@music/jukebox";
+import { PlayResult } from "@music/player";
 
 export class PlayCommand extends Command {
     constructor() {
@@ -11,36 +13,47 @@ export class PlayCommand extends Command {
     }
 
     async run(bot: Client, msg: Message, args: string[]): Promise<void> {
+        if (!msg.member || !msg.guild) {
+            return;
+        }
+
         // User should be in a voice channel
         if (!msg.member.voice.channel) {
             await msg.channel.send("You need to be in a voice channel!");
             return;
         }
 
-        // User should provide trackname in arguments
+        // User should provide track name in arguments
         if (args.length === 0) {
             await msg.channel.send("You need to provide a song name!");
             return;
         }
 
-        let jukebox = musician.get(msg.guild.id);
-        if (!jukebox) jukebox = musician.create(msg.guild.id);
+        const jukeBox = JukeBox.the();
+        let player = jukeBox.getPlayer(msg.guild.id);
 
-        // User should be in the same channel with the bot
-        if (jukebox.channel && jukebox.channel !== msg.member.voice.channel) {
+        // If a song is currently playing the user should be in same channel with the bot
+        if (player && player.channelId !== msg.member.voice.channel.id) {
             await msg.channel.send(
                 "Bot is currently playing in another channel!"
             );
             return;
         }
 
+        if (!player) {
+            player = jukeBox.createPlayer(msg.member.voice.channel.id);
+        }
+
         try {
             const video = await queryVideo(args.join(" "));
-            const result = await jukebox.play(msg.member.voice.channel, video);
-            if (result === "play") {
-                const embed = video.toEmbed("Currently playing");
+            const result = player.play(video);
+
+            if (result === PlayResult.Play) {
+                const embed = videoToEmbed(video, {
+                    title: "Currently playing",
+                });
                 await msg.channel.send({ embeds: [embed] });
-            } else if (result === "queue") {
+            } else if (result === PlayResult.Enqueue) {
                 await msg.channel.send(`${video.title} is added to the queue.`);
             }
         } catch (error) {

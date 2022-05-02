@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
 import { Command } from "@commands";
-import { queryVideo } from "../music";
+import { queryVideo, videoToEmbed } from "../music";
 
 export class SearchVideoCommand extends Command {
     constructor() {
@@ -14,7 +14,7 @@ export class SearchVideoCommand extends Command {
     async run(bot: Client, msg: Message, args: string[]): Promise<void> {
         const videoName = args.join(" ");
         const video = await queryVideo(videoName);
-        const embed = video.toEmbed();
+        const embed = videoToEmbed(video);
         msg.channel.send({ embeds: [embed] });
     }
 }

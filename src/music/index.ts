@@ -1,10 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { google } from "googleapis";
 import { API_KEY } from "@config";
-import { Musician } from "@music/musician";
-
-export { JukeBox } from "./jukebox";
-export { Musician } from "./musician";
 
 export const youtube = google.youtube("v3");
 
@@ -15,51 +11,53 @@ export async function queryVideo(query: string): Promise<Video> {
         maxResults: 1,
         q: query,
     });
-    const { id, snippet } = list.data.items[0];
-    const { channelTitle, title, description, thumbnails } = snippet;
+    if (!list.data.items || list.data.items.length === 0) {
+        throw new Error("No results found.");
+    }
 
-    return new Video(
-        id.videoId,
+    const { id, snippet } = list.data.items[0];
+    if (!id || !snippet) {
+        throw new Error("No results found.");
+    }
+
+    const { channelTitle, title, description, thumbnails } = snippet;
+    if (
+        !id?.videoId ||
+        !channelTitle ||
+        !title ||
+        !description ||
+        !thumbnails?.default?.url
+    ) {
+        throw new Error("No results found.");
+    }
+
+    return {
+        id: id.videoId,
         title,
         description,
-        channelTitle,
-        thumbnails.default.url
-    );
+        channel: channelTitle,
+        thumbnail: thumbnails.default.url,
+    };
 }
 
-export class Video {
+export interface Video {
     id: string;
     title: string;
     description: string;
     channel: string;
     thumbnail: string;
-
-    constructor(
-        id: string,
-        title: string,
-        description: string,
-        channel: string,
-        thumbnail: string
-    ) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.channel = channel;
-        this.thumbnail = thumbnail;
-    }
-
-    get url(): string {
-        return `https://www.youtube.com/watch?v=${this.id}`;
-    }
-
-    toEmbed(prefix?: string) {
-        const title = prefix ? `${prefix} - ${this.title}` : this.title;
-        return new MessageEmbed()
-            .setTitle(title)
-            .setDescription(this.description)
-            .addField("Channel", this.channel)
-            .setImage(this.thumbnail);
-    }
 }
 
-export const musician = new Musician();
+export function videoToEmbed(video: Video, opt?: Partial<Video>): MessageEmbed {
+    opt = opt || {};
+    let { title, description, channel, thumbnail } = { ...video, ...opt };
+    return new MessageEmbed()
+        .setTitle(title)
+        .setDescription(description)
+        .addField("Channel", channel)
+        .setImage(thumbnail);
+}
+
+export function videoUrl({ id }: Video): string {
+    return `https://www.youtube.com/watch?v=${id}`;
+}

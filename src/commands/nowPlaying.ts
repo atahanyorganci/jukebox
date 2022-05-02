@@ -1,7 +1,8 @@
 import { Client, Message } from "discord.js";
-import { musician } from "@music";
 import { Command } from "@commands";
 import { logger } from "@logger";
+import JukeBox from "@music/jukebox";
+import { videoToEmbed } from "@music";
 
 export class NowPlayingCommand extends Command {
     constructor() {
@@ -12,20 +13,26 @@ export class NowPlayingCommand extends Command {
     }
 
     async run(bot: Client, msg: Message, args: string[]): Promise<void> {
+        if (!msg.member || !msg.guild) {
+            return;
+        }
+
         if (args.length !== 0) {
             await msg.channel.send(
                 "Now playing command doesn't require arguments!"
             );
         }
 
-        const jukebox = musician.get(msg.guild.id);
-        if (!jukebox || !jukebox.streaming) {
+        const jukebox = JukeBox.the();
+        const player = jukebox.getPlayer(msg.guild.id);
+        if (!player) {
             await msg.channel.send("Bot is not currently playing.");
             return;
         }
 
-        logger.info(`Currently playing ${jukebox.nowPlaying.title}.`);
-        const embed = jukebox.nowPlaying.toEmbed();
+        const current = player.nowPlaying();
+        logger.info(`Currently playing ${current.title}.`);
+        const embed = videoToEmbed(current);
         await msg.channel.send({ embeds: [embed] });
     }
 }

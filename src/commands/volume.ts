@@ -1,7 +1,7 @@
 import { Client, Message } from "discord.js";
 import { Command } from "@commands";
 import { logger } from "@logger";
-import { musician } from "@music";
+import JukeBox from "@music/jukebox";
 
 export class VolumeCommand extends Command {
     constructor() {
@@ -13,9 +13,7 @@ export class VolumeCommand extends Command {
     }
 
     async run(bot: Client, msg: Message, args: string[]): Promise<void> {
-        // User should be in a voice channel
-        if (!msg.member.voice.channel) {
-            await msg.channel.send("You need to be in a voice channel!");
+        if (!msg.member || !msg.guild) {
             return;
         }
 
@@ -32,21 +30,30 @@ export class VolumeCommand extends Command {
         }
 
         // User should be in the same channel with the bot
-        const jukebox = musician.get(msg.guild.id);
-        if (!jukebox) {
+        const player = JukeBox.the().getPlayer(msg.guild.id);
+        if (!player) {
             await msg.channel.send("Bot is not currently playing!");
             return;
         }
 
-        if (jukebox.channel !== msg.member.voice.channel && jukebox.channel) {
-            await msg.channel.send(
-                "Bot is currently playing in another channel!"
-            );
+        const errorMessage =
+            "You need to be in the same voice channel with the bot to resume!";
+        // User should be in a voice channel
+        if (!msg.member.voice.channel) {
+            await msg.channel.send(errorMessage);
+            return;
+        }
+
+        const { id: channelId } = msg.member.voice.channel;
+
+        // User should be in the same channel with the bot
+        if (player.channelId !== channelId) {
+            await msg.channel.send(errorMessage);
             return;
         }
 
         try {
-            jukebox.setVolume(volume);
+            player.setVolume(volume);
             await msg.channel.send(`Volume set to ${volume}%.`);
             logger.info(`Volume set to ${volume}%.`);
         } catch (error) {

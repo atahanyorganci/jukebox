@@ -1,7 +1,7 @@
 import { Client, Message } from "discord.js";
 import { Command } from "@commands";
 import { logger } from "@logger";
-import { musician } from "@music";
+import JukeBox from "@music/jukebox";
 
 export class StopCommand extends Command {
     constructor() {
@@ -12,12 +12,16 @@ export class StopCommand extends Command {
     }
 
     async run(bot: Client, msg: Message, args: string[]): Promise<void> {
+        if (!msg.member || !msg.guild) {
+            return;
+        }
+
         if (args.length !== 0) {
             await msg.channel.send("Stop command doesn't require arguments!");
         }
 
-        const jukebox = musician.get(msg.guild.id);
-        if (!jukebox || !jukebox.streaming) {
+        const player = JukeBox.the().getPlayer(msg.guild.id);
+        if (!player || !player.isPlaying) {
             await msg.channel.send("Bot is not currently playing.");
             return;
         }
@@ -30,21 +34,17 @@ export class StopCommand extends Command {
             return;
         }
 
-        const voiceChannel = msg.member.voice.channel;
+        const { id: channelId } = msg.member.voice.channel;
 
         // User should be in the same channel with the bot
-        if (jukebox.channel !== voiceChannel && jukebox.channel) {
+        if (player.channelId !== channelId) {
             await msg.channel.send(errorMessage);
             return;
         }
 
         try {
-            const result = await jukebox.clear();
-            if (result === "success") {
-                await msg.channel.send("Stopped streaming.");
-            } else if (result === "error") {
-                await msg.channel.send("An error occurred while stopping.");
-            }
+            player.stop();
+            await msg.channel.send("Stopped streaming.");
         } catch (error) {
             logger.error(`${error} occurred while handling stop command`);
         }
