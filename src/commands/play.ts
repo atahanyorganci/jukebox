@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
 import { Command } from ".";
-import { musician, query_video } from "../music";
+import { musician, queryVideo } from "../music";
 
 export class PlayCommand extends Command {
     constructor() {
@@ -35,7 +35,7 @@ export class PlayCommand extends Command {
         }
 
         try {
-            const video = await query_video(args.join(" "));
+            const video = await queryVideo(args.join(" "));
             const result = await jukebox.play(msg.member.voice.channel, video);
             if (result === "play") {
                 await msg.channel.send(video.toEmbed("Currently playing"));

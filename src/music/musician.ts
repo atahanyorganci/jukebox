@@ -1,6 +1,6 @@
 import { JukeBox } from "./jukebox";
 
-export class Musican {
+export class Musician {
     boxes = new Map<string, JukeBox>();
 
     get(guildId: string): JukeBox | null {

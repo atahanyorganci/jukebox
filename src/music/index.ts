@@ -1,14 +1,14 @@
 import { MessageEmbed } from "discord.js";
 import { google } from "googleapis";
 import { API_KEY } from "..";
-import { Musican } from "./musician";
+import { Musician } from "./musician";
 
 export { JukeBox } from "./jukebox";
-export { Musican } from "./musician";
+export { Musician } from "./musician";
 
 export const youtube = google.youtube("v3");
 
-export async function query_video(query: string): Promise<Video> {
+export async function queryVideo(query: string): Promise<Video> {
     const list = await youtube.search.list({
         auth: API_KEY,
         part: ["id", "snippet"],
@@ -26,6 +26,7 @@ export async function query_video(query: string): Promise<Video> {
         thumbnails.default.url
     );
 }
+
 export class Video {
     id: string;
     title: string;
@@ -61,4 +62,4 @@ export class Video {
     }
 }
 
-export const musician = new Musican();
+export const musician = new Musician();
