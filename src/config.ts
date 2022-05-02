@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import { logger } from ".";
 
 export interface BotConfig {
     PREFIX: string;
@@ -8,12 +9,25 @@ export interface BotConfig {
 
 function config(): BotConfig {
     try {
-        const { PREFIX, BOT_TOKEN, API_KEY } = dotenv.config().parsed;
-        return { PREFIX, BOT_TOKEN, API_KEY };
-    } catch (err) {
-        const { PREFIX, BOT_TOKEN, API_KEY } = process.env;
-        return { PREFIX, BOT_TOKEN, API_KEY };
+        dotenv.config();
+    } catch {
+        logger.info("No .env file found, using defaults.");
     }
+    const { BOT_TOKEN, API_KEY, PREFIX } = process.env;
+    if (!BOT_TOKEN) {
+        throw new Error("`BOT_TOKEN` is not set.");
+    }
+    if (!API_KEY) {
+        throw new Error("`API_KEY` is not set.");
+    }
+    if (!PREFIX) {
+        throw new Error("`PREFIX` is not set.");
+    }
+    return {
+        PREFIX,
+        BOT_TOKEN,
+        API_KEY,
+    };
 }
 
 export default config;
