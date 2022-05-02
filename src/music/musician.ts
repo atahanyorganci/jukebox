@@ -1,4 +1,4 @@
-import { JukeBox } from "./jukebox";
+import { JukeBox } from "@music/jukebox";
 
 export class Musician {
     boxes = new Map<string, JukeBox>();

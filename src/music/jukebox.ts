@@ -1,7 +1,7 @@
 import { StreamDispatcher, VoiceChannel, VoiceConnection } from "discord.js";
 import ytdl from "ytdl-core";
 import { Video, musician } from ".";
-import { logger } from "..";
+import { logger } from "@logger";
 
 export class JukeBox {
     private _guildId: string;
@@ -81,7 +81,7 @@ export class JukeBox {
             await this.playFromQueue();
             logger.info(`Streaming ${video.title}.`);
         } catch (error) {
-            logger.error(`${error} occured when playing song.`);
+            logger.error(`${error} occurred when playing song.`);
             return "error";
         }
         return "play";
@@ -104,7 +104,7 @@ export class JukeBox {
         try {
             return this.onSongFinish();
         } catch (error) {
-            logger.error(`${error} occured when playing song.`);
+            logger.error(`${error} occurred when playing song.`);
             return "error";
         }
     }
@@ -115,7 +115,7 @@ export class JukeBox {
             await this.onSongFinish();
             return "success";
         } catch (error) {
-            logger.error(`${error} occured when playing song.`);
+            logger.error(`${error} occurred when playing song.`);
             return "error";
         }
     }
@@ -126,7 +126,7 @@ export class JukeBox {
             if (index === 0) await this.onSongFinish();
             return video[0];
         } catch (error) {
-            logger.error(`${error} occured when playing song.`);
+            logger.error(`${error} occurred when playing song.`);
             return null;
         }
     }
@@ -155,7 +155,7 @@ export class JukeBox {
                 await this.leaveChannel();
             } catch (error) {
                 logger.error(
-                    `"${error}" occured while leaving the voice channel.`
+                    `"${error}" occurred while leaving the voice channel.`
                 );
             }
             musician.delete(this._guildId);

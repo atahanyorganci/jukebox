@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { google } from "googleapis";
-import { API_KEY } from "..";
-import { Musician } from "./musician";
+import { API_KEY } from "@config";
+import { Musician } from "@music/musician";
 
 export { JukeBox } from "./jukebox";
 export { Musician } from "./musician";

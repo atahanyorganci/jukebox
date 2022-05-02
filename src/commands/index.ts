@@ -1,5 +1,6 @@
 import { Client, Message, MessageEmbed } from "discord.js";
-import { logger, PREFIX } from "..";
+import { PREFIX } from "@config";
+import { logger } from "@logger";
 
 export interface CommandOptions {
     name: string;
@@ -97,7 +98,7 @@ export class CommandDispatcher {
                 this.sendUnknownCommandMessage(cmd, msg);
             }
         } catch (error) {
-            logger.error(`${error} occured while handling ${cmd}`);
+            logger.error(`${error} occurred while handling ${cmd}`);
         }
     }
 

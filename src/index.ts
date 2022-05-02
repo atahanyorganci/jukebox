@@ -1,32 +1,18 @@
 import { Client, Intents } from "discord.js";
-import * as winston from "winston";
-import { DispatcherBuilder } from "./commands";
-import { StopCommand } from "./commands/stop";
-import { InfoCommand } from "./commands/info";
-import { NowPlayingCommand } from "./commands/nowPlaying";
-import { PauseCommand } from "./commands/pause";
-import { PlayCommand } from "./commands/play";
-import { QueueCommand } from "./commands/queue";
-import { RemoveCommand } from "./commands/remove";
-import { ResumeCommand } from "./commands/resume";
-import { SearchVideoCommand } from "./commands/search";
-import { SkipCommand } from "./commands/skip";
-import { VolumeCommand } from "./commands/volume";
-import config from "./config";
-
-export const { BOT_TOKEN, API_KEY, PREFIX } = config();
-
-const { combine, timestamp, printf, colorize } = winston.format;
-const myFormat = printf(({ level, message, timestamp }) => {
-    const colorizer = colorize();
-    const level_str = colorizer.colorize(level, `[${level.toUpperCase()}]:`);
-    return `${level_str} ${timestamp}: ${message}`;
-});
-
-export const logger = winston.createLogger({
-    format: combine(timestamp({ format: "YYYY/MM/DD HH:mm:ss" }), myFormat),
-    transports: [new winston.transports.Console()],
-});
+import { DispatcherBuilder } from "@commands";
+import { StopCommand } from "@commands/stop";
+import { InfoCommand } from "@commands/info";
+import { NowPlayingCommand } from "@commands/nowPlaying";
+import { PauseCommand } from "@commands/pause";
+import { PlayCommand } from "@commands/play";
+import { QueueCommand } from "@commands/queue";
+import { RemoveCommand } from "@commands/remove";
+import { ResumeCommand } from "@commands/resume";
+import { SearchVideoCommand } from "@commands/search";
+import { SkipCommand } from "@commands/skip";
+import { VolumeCommand } from "@commands/volume";
+import { BOT_TOKEN } from "@config";
+import { logger } from "@logger";
 
 export const bot = new Client({
     intents: [

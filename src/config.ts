@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { logger } from ".";
+import { logger } from "@logger";
 
 export interface BotConfig {
     PREFIX: string;
@@ -31,3 +31,4 @@ function config(): BotConfig {
 }
 
 export default config;
+export const { BOT_TOKEN, API_KEY, PREFIX } = config();

@@ -1,7 +1,7 @@
 import { Client, Message } from "discord.js";
-import { musician } from "../music";
-import { Command } from ".";
-import { logger } from "..";
+import { musician } from "@music";
+import { Command } from "@commands";
+import { logger } from "@logger";
 
 export class NowPlayingCommand extends Command {
     constructor() {

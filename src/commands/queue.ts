@@ -1,6 +1,6 @@
 import { Client, Message, MessageEmbed } from "discord.js";
-import { Command } from ".";
-import { musician } from "../music";
+import { Command } from "@commands";
+import { musician } from "@music";
 
 export class QueueCommand extends Command {
     constructor() {

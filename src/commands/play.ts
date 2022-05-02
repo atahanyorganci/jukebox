@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { Command } from ".";
+import { Command } from "@commands";
 import { musician, queryVideo } from "../music";
 
 export class PlayCommand extends Command {
@@ -44,7 +44,7 @@ export class PlayCommand extends Command {
                 await msg.channel.send(`${video.title} is added to the queue.`);
             }
         } catch (error) {
-            await msg.channel.send("An error occured playing a song.");
+            await msg.channel.send("An error occurred playing a song.");
         }
     }
 }

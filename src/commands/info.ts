@@ -1,5 +1,5 @@
 import { Client, Message, MessageEmbed } from "discord.js";
-import { Command } from ".";
+import { Command } from "@commands";
 
 export class InfoCommand extends Command {
     constructor() {

@@ -2,7 +2,13 @@
     "extends": "@tsconfig/node16/tsconfig.json",
     "compilerOptions": {
         "outDir": "./dist/",
-        "sourceMap": true
+        "sourceMap": true,
+        "baseUrl": "./src/",
+        "module": "CommonJS",
+        "paths": {
+            "@*": ["./*"]
+        },
+        "plugins": [{ "transform": "typescript-transform-paths" }]
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "**/*.d.ts"]

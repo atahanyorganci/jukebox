@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { Command } from ".";
+import { Command } from "@commands";
 import { queryVideo } from "../music";
 
 export class SearchVideoCommand extends Command {
