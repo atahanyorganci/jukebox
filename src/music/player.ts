@@ -1,4 +1,13 @@
-import { Video } from "@music";
+import {
+    AudioPlayer,
+    AudioPlayerStatus,
+    createAudioPlayer,
+    getVoiceConnection,
+    joinVoiceChannel,
+    VoiceConnection,
+} from "@discordjs/voice";
+import { Video, videoToAudioResource } from "@music";
+import { VoiceChannel } from "discord.js";
 
 export enum PlayResult {
     Play,
@@ -13,24 +22,63 @@ export enum PlayerState {
 }
 
 export default class Player {
-    channelId: string;
-    queue: Video[];
-    volume: number;
-    state: PlayerState;
+    private _state: PlayerState = PlayerState.Init;
+    private _player: AudioPlayer;
 
-    constructor(channelId: string) {
-        this.channelId = channelId;
-        this.queue = [];
-        this.volume = 1.0;
-        this.state = PlayerState.Init;
+    queue: Video[] = [];
+    volume: number = 1.0;
+
+    public get state(): PlayerState {
+        return this._state;
+    }
+
+    public set state(v: PlayerState) {
+        this._state = v;
+    }
+
+    constructor(public guildId: string, public channelId: string) {
+        this._player = createAudioPlayer();
+        this._player.on(AudioPlayerStatus.Idle, () => this.handlePlayerIdle());
+    }
+
+    private handlePlayerIdle(): void {
+        console.log("Player idle");
     }
 
     public get isPlaying(): boolean {
-        return false;
+        return this.state === PlayerState.Playing;
     }
 
-    play(video: Video): PlayResult {
-        throw new Error("Method not implemented.");
+    private getVoiceConnection(channel: VoiceChannel): VoiceConnection {
+        if (this.state === PlayerState.Init) {
+            return joinVoiceChannel({
+                channelId: channel.id,
+                guildId: channel.guild.id,
+                adapterCreator: channel.guild.voiceAdapterCreator,
+            });
+        }
+        const connection = getVoiceConnection(this.guildId);
+        if (!connection) {
+            throw new Error("No voice connection found.");
+        }
+        return connection;
+    }
+
+    private enqueue(video: Video): void {
+        this.queue.push(video);
+    }
+
+    play(channel: VoiceChannel, video: Video): PlayResult {
+        this.enqueue(video);
+        if (this.state !== PlayerState.Init) {
+            return PlayResult.Enqueue;
+        }
+        const connection = this.getVoiceConnection(channel);
+        connection.subscribe(this._player);
+
+        this._player.play(videoToAudioResource(video));
+        this.state = PlayerState.Playing;
+        return PlayResult.Play;
     }
 
     nowPlaying(): Video {

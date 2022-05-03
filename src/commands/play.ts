@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { Client, Message, VoiceChannel } from "discord.js";
 import { Command } from "@commands";
 import { queryVideo, videoToEmbed } from "@music";
 import JukeBox from "@music/jukebox";
@@ -41,16 +41,20 @@ export class PlayCommand extends Command {
         }
 
         if (!player) {
-            player = jukeBox.createPlayer(msg.member.voice.channel.id);
+            const channelId = msg.member.voice.channel.id;
+            const guildId = msg.guild.id;
+            player = jukeBox.createPlayer(guildId, channelId);
         }
 
         try {
             const video = await queryVideo(args.join(" "));
-            const result = player.play(video);
+            const voiceChannel =
+                (await msg.member.voice.channel.fetch()) as VoiceChannel;
+            const result = player.play(voiceChannel, video);
 
             if (result === PlayResult.Play) {
                 const embed = videoToEmbed(video, {
-                    title: "Currently playing",
+                    title: `Currently playing: ${video.title}`,
                 });
                 await msg.channel.send({ embeds: [embed] });
             } else if (result === PlayResult.Enqueue) {

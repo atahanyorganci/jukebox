@@ -2,8 +2,7 @@ import Player from "@music/player";
 
 class JukeBox {
     private static _instance: JukeBox;
-
-    private constructor() {}
+    private _players: Map<string, Player> = new Map();
 
     public static the(): JukeBox {
         if (!JukeBox._instance) {
@@ -13,11 +12,17 @@ class JukeBox {
     }
 
     public getPlayer(guildId: string): Player | null {
-        throw new Error("Method not implemented.");
+        const player = this._players.get(guildId);
+        if (player) {
+            return player;
+        }
+        return null;
     }
 
-    public createPlayer(channelId: string): Player {
-        throw new Error("Method not implemented.");
+    public createPlayer(guildId: string, channelId: string): Player {
+        const player = new Player(guildId, channelId);
+        this._players.set(channelId, player);
+        return player;
     }
 }
 
