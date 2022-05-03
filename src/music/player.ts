@@ -8,6 +8,7 @@ import {
 } from "@discordjs/voice";
 import { Video, videoToAudioResource } from "@music";
 import { VoiceChannel } from "discord.js";
+import VideoQueue from "@music/queue";
 
 export enum PlayResult {
     Play,
@@ -25,7 +26,7 @@ export default class Player {
     private _state: PlayerState = PlayerState.Init;
     private _player: AudioPlayer;
 
-    queue: Video[] = [];
+    queue: VideoQueue = new VideoQueue();
     volume: number = 1.0;
 
     public get state(): PlayerState {
@@ -64,12 +65,8 @@ export default class Player {
         return connection;
     }
 
-    private enqueue(video: Video): void {
-        this.queue.push(video);
-    }
-
     play(channel: VoiceChannel, video: Video): PlayResult {
-        this.enqueue(video);
+        this.queue.enqueue(video);
         if (this.state !== PlayerState.Init) {
             return PlayResult.Enqueue;
         }

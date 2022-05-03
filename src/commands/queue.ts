@@ -26,13 +26,14 @@ export class QueueCommand extends Command {
             return;
         }
 
-        let description = "";
-        for (let i = 0; i < player.queue.length; i++) {
-            const track = player.queue[i];
-            description = `${description}\n${i + 1}) ${track.title} by ${
-                track.channel
-            }`;
-        }
+        const lines = player.queue.map(({ title }, index) => {
+            if (index === 0) {
+                return `Currently playing ${title}`;
+            }
+            return `${index}. ${title}`;
+        });
+        const description = lines.join("\n");
+
         const embed = new MessageEmbed()
             .setTitle("Music Queue")
             .setDescription(description)

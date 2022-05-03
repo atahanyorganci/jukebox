@@ -4,6 +4,7 @@ import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 import { PlayerState } from "@music/player";
 import { videoToEmbed } from "@music";
+import { unreachable } from "@util";
 
 export class SkipCommand extends Command {
     constructor() {
@@ -50,6 +51,12 @@ export class SkipCommand extends Command {
                 await msg.channel.send("No more songs in queue.");
             }
             const current = player.nowPlaying();
+            if (!current) {
+                unreachable(
+                    "`queue.current` should not be `null` if `queue.state` is not `Stopped`."
+                );
+            }
+
             const embed = videoToEmbed(current, {
                 title: `Skipped ${title} and currently playing:`,
             });

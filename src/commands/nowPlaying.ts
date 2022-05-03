@@ -25,14 +25,21 @@ export class NowPlayingCommand extends Command {
 
         const jukebox = JukeBox.the();
         const player = jukebox.getPlayer(msg.guild.id);
+
         if (!player) {
-            await msg.channel.send("Bot is not currently playing.");
-            return;
+            return this.botNotPlayingError(bot, msg);
+        }
+        const current = player.nowPlaying();
+        if (!current) {
+            return this.botNotPlayingError(bot, msg);
         }
 
-        const current = player.nowPlaying();
         logger.info(`Currently playing ${current.title}.`);
         const embed = videoToEmbed(current);
         await msg.channel.send({ embeds: [embed] });
+    }
+
+    async botNotPlayingError(bot: Client, message: Message): Promise<void> {
+        await message.channel.send("Bot is not currently playing.");
     }
 }
