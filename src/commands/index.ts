@@ -82,9 +82,9 @@ export class CommandDispatcher {
         const [cmd, ...args] = content.slice(PREFIX.length).trim().split(/ +/);
 
         if (args.length !== 0) {
-            logger.info(`Recived command "${cmd}" with [${args.join(", ")}]`);
+            logger.info(`Received command "${cmd}" with [${args.join(", ")}]`);
         } else {
-            logger.info(`Recived command "${cmd}"`);
+            logger.info(`Received command "${cmd}"`);
         }
 
         const command =
