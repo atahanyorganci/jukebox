@@ -1,6 +1,8 @@
 import { MessageEmbed } from "discord.js";
 import { google } from "googleapis";
 import { API_KEY } from "@config";
+import { AudioResource, createAudioResource } from "@discordjs/voice";
+import ytdl from "ytdl-core";
 
 export const youtube = google.youtube("v3");
 
@@ -60,4 +62,21 @@ export function videoToEmbed(video: Video, opt?: Partial<Video>): MessageEmbed {
 
 export function videoUrl({ id }: Video): string {
     return `https://www.youtube.com/watch?v=${id}`;
+}
+
+interface Meta {
+    title: string;
+}
+
+export function videoToAudioResource(video: Video): AudioResource<Meta> {
+    const url = videoUrl(video);
+    const { title } = video;
+    const stream = ytdl(url, {
+        filter: "audioonly",
+    });
+    return createAudioResource(stream, {
+        metadata: {
+            title: title,
+        },
+    });
 }
