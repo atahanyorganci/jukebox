@@ -4,12 +4,12 @@
         "outDir": "./dist/",
         "sourceMap": true,
         "baseUrl": "./src/",
-        "module": "CommonJS",
         "paths": {
             "@*": ["./*"]
         },
+        "target": "ES2020",
         "plugins": [{ "transform": "typescript-transform-paths" }]
     },
     "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "**/*.d.ts", "**/*.spec.ts"]
+    "exclude": ["node_modules", "**/*.d.ts"]
 }
