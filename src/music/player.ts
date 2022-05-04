@@ -111,7 +111,14 @@ export default class Player extends EventEmitter {
     }
 
     pause(): void {
-        throw new Error("Method not implemented.");
+        if (!this.isPlaying) {
+            return;
+        }
+        const success = this.player.pause(true);
+        if (!success) {
+            throw new Error("Unable to pause player.");
+        }
+        this.state = PlayerState.Paused;
     }
 
     stop(): void {
@@ -123,7 +130,14 @@ export default class Player extends EventEmitter {
     }
 
     resume(): void {
-        throw new Error("Method not implemented.");
+        if (this.isPlaying) {
+            return;
+        }
+        const success = this.player.unpause();
+        if (!success) {
+            throw new Error("Unable to resume player.");
+        }
+        this.state = PlayerState.Playing;
     }
 
     remove(index: number): Video {

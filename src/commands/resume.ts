@@ -3,6 +3,9 @@ import { Command } from "@commands";
 import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 
+const ERROR_MSG =
+    "You need to be in the same voice channel with the bot to resume!";
+
 export class ResumeCommand extends Command {
     constructor() {
         super({
@@ -22,20 +25,20 @@ export class ResumeCommand extends Command {
         const player = JukeBox.the().getPlayer(msg.guild.id);
 
         if (!player) {
-            await msg.channel.send("Bot isn't currently playing!");
+            await msg.channel.send(
+                "Bot is not currently playing in any voice channel!"
+            );
             return;
         }
 
         if (player.isPlaying) {
-            await msg.channel.send("Bot is currently playing.");
+            await msg.channel.send("Bot is already playing!");
             return;
         }
 
-        const errorMessage =
-            "You need to be in the same voice channel with the bot to resume!";
         // User should be in a voice channel
         if (!msg.member.voice.channel) {
-            await msg.channel.send(errorMessage);
+            await msg.channel.send(ERROR_MSG);
             return;
         }
 
@@ -43,7 +46,7 @@ export class ResumeCommand extends Command {
 
         // User should be in the same channel with the bot
         if (player.channelId !== channelId) {
-            await msg.channel.send(errorMessage);
+            await msg.channel.send(ERROR_MSG);
             return;
         }
 

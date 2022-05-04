@@ -26,13 +26,8 @@ export class PauseCommand extends Command {
         const jukeBox = JukeBox.the();
         const player = jukeBox.getPlayer(msg.guild.id);
 
-        if (!player) {
+        if (!player || !player.isPlaying) {
             await msg.channel.send("Bot is not currently playing.");
-            return;
-        }
-
-        if (!player.isPlaying) {
-            await msg.channel.send("Bot is currently paused.");
             return;
         }
 
