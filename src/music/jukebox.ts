@@ -24,7 +24,7 @@ class JukeBox {
     public createPlayer(guildId: string, channelId: string): Player {
         const player = new Player(guildId, channelId);
         player.on("stopped", () => this.deletePlayer(guildId));
-        this._players.set(channelId, player);
+        this._players.set(guildId, player);
         return player;
     }
 
