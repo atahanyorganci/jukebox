@@ -1,4 +1,6 @@
+import { getVoiceConnection } from "@discordjs/voice";
 import Player from "@music/player";
+import { unreachable } from "@util";
 
 class JukeBox {
     private static _instance: JukeBox;
@@ -21,8 +23,18 @@ class JukeBox {
 
     public createPlayer(guildId: string, channelId: string): Player {
         const player = new Player(guildId, channelId);
+        player.on("stopped", () => this.deletePlayer(guildId));
         this._players.set(channelId, player);
         return player;
+    }
+
+    private deletePlayer(guildId: string) {
+        this._players.delete(guildId);
+        const connection = getVoiceConnection(guildId);
+        if (!connection) {
+            unreachable("Deleting a player without voice connection");
+        }
+        connection.destroy();
     }
 }
 

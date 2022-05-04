@@ -8,7 +8,9 @@ import {
 } from "@discordjs/voice";
 import { Video, videoToAudioResource } from "@music";
 import { VoiceChannel } from "discord.js";
+import EventEmitter from "events";
 import VideoQueue from "@music/queue";
+import { unreachable } from "@util";
 
 export enum PlayResult {
     Play,
@@ -22,9 +24,9 @@ export enum PlayerState {
     Stopped,
 }
 
-export default class Player {
+export default class Player extends EventEmitter {
     private _state: PlayerState = PlayerState.Init;
-    private _player: AudioPlayer;
+    private _player: AudioPlayer | null = null;
 
     queue: VideoQueue = new VideoQueue();
     volume: number = 1.0;
@@ -33,17 +35,43 @@ export default class Player {
         return this._state;
     }
 
-    public set state(v: PlayerState) {
+    private set state(v: PlayerState) {
         this._state = v;
     }
 
+    private get player(): AudioPlayer {
+        if (!this._player) {
+            this._player = createAudioPlayer();
+        }
+        return this._player;
+    }
+
+    private set player(player: null | AudioPlayer) {
+        if (this._player) {
+            this._player.stop();
+        }
+        this._player = player;
+    }
+
     constructor(public guildId: string, public channelId: string) {
-        this._player = createAudioPlayer();
-        this._player.on(AudioPlayerStatus.Idle, () => this.handlePlayerIdle());
+        super();
+        this.player.on(AudioPlayerStatus.Idle, () => this.handlePlayerIdle());
     }
 
     private handlePlayerIdle(): void {
-        console.log("Player idle");
+        const prev = this.queue.dequeue();
+        if (!prev) {
+            unreachable("Player idle without any song in queue!");
+        }
+        if (this.queue.isEmpty) {
+            return this.stopPlayer();
+        }
+    }
+
+    private stopPlayer() {
+        this.state = PlayerState.Stopped;
+        this.player = null;
+        this.emit("stopped");
     }
 
     public get isPlaying(): boolean {
@@ -55,7 +83,7 @@ export default class Player {
             return joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guild.id,
-                adapterCreator: channel.guild.voiceAdapterCreator,
+                adapterCreator: channel.guild.voiceAdapterCreator as any,
             });
         }
         const connection = getVoiceConnection(this.guildId);
@@ -71,15 +99,15 @@ export default class Player {
             return PlayResult.Enqueue;
         }
         const connection = this.getVoiceConnection(channel);
-        connection.subscribe(this._player);
+        connection.subscribe(this.player);
 
-        this._player.play(videoToAudioResource(video));
+        this.player.play(videoToAudioResource(video));
         this.state = PlayerState.Playing;
         return PlayResult.Play;
     }
 
-    nowPlaying(): Video {
-        throw new Error("Method not implemented.");
+    nowPlaying(): Video | null {
+        return this.queue.current;
     }
 
     pause(): void {
