@@ -64,19 +64,24 @@ export function videoUrl({ id }: Video): string {
     return `https://www.youtube.com/watch?v=${id}`;
 }
 
-interface Meta {
-    title: string;
-}
-
-export function videoToAudioResource(video: Video): AudioResource<Meta> {
+/**
+ * Convert YouTube video to `AudioResource<Video>` that is playable in Discord with
+ * YouTube video's metadata.
+ * @param video YouTube video
+ * @param optimize optimize the audio by disabling variable volume
+ * @returns AudioResource
+ */
+export function videoToAudioResource(
+    video: Video,
+    optimize?: boolean
+): AudioResource<Video> {
     const url = videoUrl(video);
-    const { title } = video;
     const stream = ytdl(url, {
         filter: "audioonly",
     });
+    let inlineVolume = !optimize;
     return createAudioResource(stream, {
-        metadata: {
-            title: title,
-        },
+        inlineVolume,
+        metadata: video,
     });
 }
