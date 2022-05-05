@@ -1,5 +1,5 @@
 import { Client, Message, MessageEmbed } from "discord.js";
-import { Command } from "@commands";
+import { Command, CommandContext } from "@commands";
 
 export class InfoCommand extends Command {
     constructor() {
@@ -10,20 +10,20 @@ export class InfoCommand extends Command {
         });
     }
 
-    async run(bot: Client, msg: Message, args: string[]): Promise<void> {
+    async run({ message, bot }: CommandContext, args: string[]): Promise<void> {
         const [arg, ...rest] = args;
         if (rest.length !== 0) {
-            await this.sendErrorMessage(msg);
+            await this.sendErrorMessage(message);
             return;
         }
-        const { guild, member } = msg;
+        const { guild, member } = message;
 
         if (arg === "bot" && bot.user) {
-            await this.sendBotInfo(bot, msg);
+            await this.sendBotInfo(bot, message);
         } else if (arg === "server" && guild && member) {
-            await this.sendServerInfo(bot, msg);
+            await this.sendServerInfo(bot, message);
         } else {
-            await this.sendErrorMessage(msg);
+            await this.sendErrorMessage(message);
         }
     }
 

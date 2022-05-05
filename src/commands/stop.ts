@@ -1,5 +1,4 @@
-import { Client, Message } from "discord.js";
-import { Command } from "@commands";
+import { Command, CommandContext } from "@commands";
 import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 
@@ -11,24 +10,29 @@ export class StopCommand extends Command {
         });
     }
 
-    async run(bot: Client, msg: Message, args: string[]): Promise<void> {
-        if (!msg.member || !msg.guild) {
+    async run(
+        { message, guild, member }: CommandContext,
+        args: string[]
+    ): Promise<void> {
+        if (!message.member || !message.guild) {
             return;
         }
 
         if (args.length !== 0) {
-            await msg.channel.send("Stop command doesn't require arguments!");
+            await message.channel.send(
+                "Stop command doesn't require arguments!"
+            );
         }
 
-        const player = JukeBox.the().getPlayer(msg.guild.id);
+        const player = JukeBox.the().getPlayer(guild.id);
         if (!player || !player.isPlaying) {
-            await msg.channel.send("Bot is not currently playing.");
+            await message.channel.send("Bot is not currently playing.");
             return;
         }
 
         // User should be in the same channel with the bot
-        if (player.channelId !== msg.member.voice.channel?.id) {
-            await msg.channel.send(
+        if (player.channelId !== member.voice.channel?.id) {
+            await message.channel.send(
                 "You need to be in the same voice channel with the bot to stop it"
             );
             return;
@@ -36,7 +40,7 @@ export class StopCommand extends Command {
 
         try {
             player.stop();
-            await msg.channel.send("Stopped streaming.");
+            await message.channel.send("Stopped streaming.");
         } catch (error) {
             logger.error(`${error} occurred while handling stop command`);
         }

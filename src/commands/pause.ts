@@ -1,10 +1,6 @@
-import { Client, Message } from "discord.js";
-import { Command } from "@commands";
+import { Command, CommandContext } from "@commands";
 import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
-
-const ERROR_MESSAGE =
-    "You should be in the same voice channel with the bot to pause!";
 
 export class PauseCommand extends Command {
     constructor() {
@@ -14,37 +10,34 @@ export class PauseCommand extends Command {
         });
     }
 
-    async run(bot: Client, msg: Message, args: string[]): Promise<void> {
-        if (!msg.member || !msg.guild) {
-            return;
-        }
-
+    async run(
+        { message, guild, member }: CommandContext,
+        args: string[]
+    ): Promise<void> {
         if (args.length !== 0) {
-            await msg.channel.send("Pause command doesn't require arguments!");
+            await message.channel.send(
+                "Pause command doesn't require arguments!"
+            );
         }
 
         const jukeBox = JukeBox.the();
-        const player = jukeBox.getPlayer(msg.guild.id);
+        const player = jukeBox.getPlayer(guild.id);
 
         if (!player || !player.isPlaying) {
-            await msg.channel.send("Bot is not currently playing.");
+            await message.channel.send("Bot is not currently playing.");
             return;
         }
 
         // User should be in the same channel with the bot
-        if (!msg.member.voice.channel) {
-            await msg.channel.send(ERROR_MESSAGE);
-            return;
-        }
-
-        const { id: channelId } = msg.member.voice.channel;
-        if (player.channelId !== channelId) {
-            await msg.channel.send(ERROR_MESSAGE);
+        if (player.channelId !== member.voice.channel?.id) {
+            await message.channel.send(
+                "You should be in the same voice channel with the bot to pause!"
+            );
             return;
         }
 
         player.pause();
         logger.info("Streaming paused.");
-        await msg.channel.send("Streaming paused.");
+        await message.channel.send("Streaming paused.");
     }
 }

@@ -1,4 +1,4 @@
-import { Client, Message, MessageEmbed } from "discord.js";
+import { Client, Guild, GuildMember, Message, MessageEmbed } from "discord.js";
 import { PREFIX } from "@config";
 import { logger } from "@logger";
 
@@ -6,6 +6,13 @@ export interface CommandOptions {
     name: string;
     description?: string;
     aliases?: string[];
+}
+
+export interface CommandContext {
+    bot: Client;
+    message: Message;
+    guild: Guild;
+    member: GuildMember;
 }
 
 export abstract class Command {
@@ -19,7 +26,7 @@ export abstract class Command {
         this.description = description;
     }
 
-    abstract run(bot: Client, msg: Message, args: string[]): Promise<void>;
+    abstract run(context: CommandContext, args: string[]): Promise<void>;
 }
 
 class HelpCommand extends Command {
@@ -47,12 +54,12 @@ class HelpCommand extends Command {
         return response;
     }
 
-    async run(bot: Client, msg: Message, args: string[]): Promise<void> {
+    async run({ message }: CommandContext, args: string[]): Promise<void> {
         if (args.length > 0)
             this.response.setDescription(
                 "Help command doesn't require arguments"
             );
-        await msg.channel.send({ embeds: [this.response] });
+        await message.channel.send({ embeds: [this.response] });
     }
 }
 
@@ -75,9 +82,12 @@ export class CommandDispatcher {
         commands.forEach(command => this.register(command));
     }
 
-    async handle(bot: Client, msg: Message): Promise<void> {
-        const { content, author } = msg;
-        if (!content.startsWith(PREFIX) || author.bot) return;
+    async handle(bot: Client, message: Message): Promise<void> {
+        const { content, author, member, guild } = message;
+
+        if (!content.startsWith(PREFIX) || author.bot || !member || !guild) {
+            return;
+        }
 
         const [cmd, ...args] = content.slice(PREFIX.length).trim().split(/ +/);
 
@@ -93,9 +103,9 @@ export class CommandDispatcher {
 
         try {
             if (command) {
-                await command.run(bot, msg, args);
+                await command.run({ bot, message, guild, member }, args);
             } else {
-                await this.sendUnknownCommandMessage(cmd, msg);
+                await this.sendUnknownCommandMessage(cmd, message);
             }
         } catch (error) {
             logger.error(`'${error}' occurred while handling ${cmd}`);

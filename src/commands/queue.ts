@@ -1,5 +1,5 @@
-import { Client, Message, MessageEmbed } from "discord.js";
-import { Command } from "@commands";
+import { MessageEmbed } from "discord.js";
+import { Command, CommandContext } from "@commands";
 import JukeBox from "@music/jukebox";
 
 export class QueueCommand extends Command {
@@ -10,19 +10,18 @@ export class QueueCommand extends Command {
         });
     }
 
-    async run(bot: Client, msg: Message, args: string[]): Promise<void> {
-        if (!msg.member || !msg.guild) {
-            return;
-        }
-
+    async run(
+        { message, guild }: CommandContext,
+        args: string[]
+    ): Promise<void> {
         if (args.length !== 0) {
-            await msg.channel.send(
+            await message.channel.send(
                 "Now playing command doesn't require arguments!"
             );
         }
-        const player = JukeBox.the().getPlayer(msg.guild.id);
+        const player = JukeBox.the().getPlayer(guild.id);
         if (!player) {
-            await msg.channel.send("Bot is not currently playing.");
+            await message.channel.send("Bot is not currently playing.");
             return;
         }
 
@@ -39,6 +38,6 @@ export class QueueCommand extends Command {
             .setDescription(description)
             .setColor("#123123");
 
-        await msg.channel.send({ embeds: [embed] });
+        await message.channel.send({ embeds: [embed] });
     }
 }

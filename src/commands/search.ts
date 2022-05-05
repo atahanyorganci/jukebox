@@ -1,5 +1,4 @@
-import { Client, Message } from "discord.js";
-import { Command } from "@commands";
+import { Command, CommandContext } from "@commands";
 import { queryVideo, videoToEmbed } from "../music";
 
 export class SearchVideoCommand extends Command {
@@ -11,10 +10,10 @@ export class SearchVideoCommand extends Command {
         });
     }
 
-    async run(bot: Client, msg: Message, args: string[]): Promise<void> {
+    async run({ message }: CommandContext, args: string[]): Promise<void> {
         const videoName = args.join(" ");
         const video = await queryVideo(videoName);
         const embed = videoToEmbed(video);
-        await msg.channel.send({ embeds: [embed] });
+        await message.channel.send({ embeds: [embed] });
     }
 }
