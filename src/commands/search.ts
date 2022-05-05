@@ -15,6 +15,6 @@ export class SearchVideoCommand extends Command {
         const videoName = args.join(" ");
         const video = await queryVideo(videoName);
         const embed = videoToEmbed(video);
-        msg.channel.send({ embeds: [embed] });
+        await msg.channel.send({ embeds: [embed] });
     }
 }

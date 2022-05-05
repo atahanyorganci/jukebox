@@ -16,7 +16,7 @@ export class InfoCommand extends Command {
             await this.sendErrorMessage(msg);
             return;
         }
-        const { guild, member, channel } = msg;
+        const { guild, member } = msg;
 
         if (arg === "bot" && bot.user) {
             await this.sendBotInfo(bot, msg);

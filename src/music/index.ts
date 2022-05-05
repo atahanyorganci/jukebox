@@ -52,7 +52,7 @@ export interface Video {
 
 export function videoToEmbed(video: Video, opt?: Partial<Video>): MessageEmbed {
     opt = opt || {};
-    let { title, description, channel, thumbnail } = { ...video, ...opt };
+    const { title, description, channel, thumbnail } = { ...video, ...opt };
     return new MessageEmbed()
         .setTitle(title)
         .setDescription(description)
@@ -79,7 +79,7 @@ export function videoToAudioResource(
     const stream = ytdl(url, {
         filter: "audioonly",
     });
-    let inlineVolume = !optimize;
+    const inlineVolume = !optimize;
     return createAudioResource(stream, {
         inlineVolume,
         metadata: video,

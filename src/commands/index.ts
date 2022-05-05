@@ -93,12 +93,12 @@ export class CommandDispatcher {
 
         try {
             if (command) {
-                command.run(bot, msg, args);
+                await command.run(bot, msg, args);
             } else {
-                this.sendUnknownCommandMessage(cmd, msg);
+                await this.sendUnknownCommandMessage(cmd, msg);
             }
         } catch (error) {
-            logger.error(`${error} occurred while handling ${cmd}`);
+            logger.error(`'${error}' occurred while handling ${cmd}`);
         }
     }
 

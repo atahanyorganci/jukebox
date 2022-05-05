@@ -2,6 +2,7 @@ import {
     AudioPlayer,
     AudioPlayerStatus,
     createAudioPlayer,
+    DiscordGatewayAdapterCreator,
     getVoiceConnection,
     joinVoiceChannel,
     VoiceConnection,
@@ -29,7 +30,7 @@ export default class Player extends EventEmitter {
     private _player: AudioPlayer | null = null;
 
     queue: VideoQueue = new VideoQueue();
-    volume: number = 1.0;
+    volume = 1.0;
 
     public get state(): PlayerState {
         return this._state;
@@ -68,7 +69,7 @@ export default class Player extends EventEmitter {
         }
     }
 
-    private stopPlayer() {
+    private stopPlayer(): void {
         this.state = PlayerState.Stopped;
         this.player = null;
         this.emit("stopped");
@@ -83,7 +84,8 @@ export default class Player extends EventEmitter {
             return joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guild.id,
-                adapterCreator: channel.guild.voiceAdapterCreator as any,
+                adapterCreator: channel.guild
+                    .voiceAdapterCreator as DiscordGatewayAdapterCreator,
             });
         }
         const connection = getVoiceConnection(this.guildId);
@@ -125,7 +127,7 @@ export default class Player extends EventEmitter {
         throw new Error("Method not implemented.");
     }
 
-    setVolume(volume: number): void {
+    setVolume(_volume: number): void {
         throw new Error("Method not implemented.");
     }
 
@@ -140,7 +142,7 @@ export default class Player extends EventEmitter {
         this.state = PlayerState.Playing;
     }
 
-    remove(index: number): Video {
+    remove(_index: number): Video {
         throw new Error("Method not implemented.");
     }
 

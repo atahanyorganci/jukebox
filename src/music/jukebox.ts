@@ -28,7 +28,7 @@ class JukeBox {
         return player;
     }
 
-    private deletePlayer(guildId: string) {
+    private deletePlayer(guildId: string): void {
         this._players.delete(guildId);
         const connection = getVoiceConnection(guildId);
         if (!connection) {
