@@ -1,19 +1,21 @@
-FROM node:14-alpine as builder
+FROM node:16-alpine as builder
 
 WORKDIR /bot
-COPY package*.json ./
-RUN npm install
+COPY package.json yarn.lock ./
+RUN yarn install
 
 COPY src src
 COPY tsconfig.json .
-RUN npm run build
+RUN yarn build
 
-FROM node:14-alpine as runner
+FROM node:16-alpine as runner
+
+RUN apk add --no-cache ffmpeg
 
 WORKDIR /bot
-COPY package*.json ./
+COPY package.json yarn.lock ./
 ENV NODE_ENV production
-RUN npm install
+RUN yarn install
 
 COPY --from=builder /bot/dist dist
 
