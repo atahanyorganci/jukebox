@@ -48,16 +48,8 @@ export class VolumeCommand extends Command {
             return;
         }
 
-        try {
-            player.setVolume(volume / 100);
-            await message.channel.send(`Volume set to ${volume}%.`);
-            logger.info(`Volume set to ${volume}%.`);
-        } catch (error) {
-            logger.error("Error occurred when joining channel.");
-            await message.channel.send(
-                "An error occurred while joining your channel."
-            );
-            return;
-        }
+        player.setVolume(volume / 100);
+        await message.channel.send(`Volume set to ${volume}%.`);
+        logger.info(`Volume set to ${volume}%.`);
     }
 }

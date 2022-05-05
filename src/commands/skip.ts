@@ -1,5 +1,4 @@
 import { Command, CommandContext } from "@commands";
-import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 import { PlayerState } from "@music/player";
 import { videoToEmbed } from "@music";
@@ -38,24 +37,20 @@ export class SkipCommand extends Command {
             return;
         }
 
-        try {
-            const skipped = player.skip();
-            if (player.state === PlayerState.Stopped) {
-                await message.channel.send("No more songs in queue.");
-                return;
-            }
-            const current = player.nowPlaying();
-            if (!current) {
-                unreachable(
-                    "`queue.current` should not be `null` if `queue.state` is not `Stopped`."
-                );
-            }
-            const embed = videoToEmbed(current, {
-                title: `Skipped ${skipped.title} and currently playing ${current.title}`,
-            });
-            await message.channel.send({ embeds: [embed] });
-        } catch (error) {
-            logger.error(`${error} occurred while handling skip command`);
+        const skipped = player.skip();
+        if (player.state === PlayerState.Stopped) {
+            await message.channel.send("No more songs in queue.");
+            return;
         }
+        const current = player.nowPlaying();
+        if (!current) {
+            unreachable(
+                "`queue.current` should not be `null` if `queue.state` is not `Stopped`."
+            );
+        }
+        const embed = videoToEmbed(current, {
+            title: `Skipped ${skipped.title} and currently playing ${current.title}`,
+        });
+        await message.channel.send({ embeds: [embed] });
     }
 }

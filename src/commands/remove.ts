@@ -1,5 +1,4 @@
 import { Command, CommandContext } from "@commands";
-import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 import { videoToEmbed } from "@music";
 
@@ -41,14 +40,10 @@ export class RemoveCommand extends Command {
             return;
         }
 
-        try {
-            const video = player.remove(index);
-            const embed = videoToEmbed(video, {
-                title: `Removed '${video.title}' from queue`,
-            });
-            await message.channel.send({ embeds: [embed] });
-        } catch (error) {
-            logger.error(`${error} occurred while handling remove command`);
-        }
+        const video = player.remove(index);
+        const embed = videoToEmbed(video, {
+            title: `Removed '${video.title}' from queue`,
+        });
+        await message.channel.send({ embeds: [embed] });
     }
 }

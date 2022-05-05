@@ -1,5 +1,4 @@
 import { Command, CommandContext } from "@commands";
-import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 
 export class StopCommand extends Command {
@@ -38,11 +37,7 @@ export class StopCommand extends Command {
             return;
         }
 
-        try {
-            player.stop();
-            await message.channel.send("Stopped streaming.");
-        } catch (error) {
-            logger.error(`${error} occurred while handling stop command`);
-        }
+        player.stop();
+        await message.channel.send("Stopped streaming.");
     }
 }

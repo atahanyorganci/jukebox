@@ -48,23 +48,17 @@ export class PlayCommand extends Command {
             player = jukeBox.createPlayer(guild.id, channelId);
         }
 
-        try {
-            const video = await queryVideo(args.join(" "));
-            const voiceChannel = await member.voice.channel.fetch();
-            const result = player.play(voiceChannel as VoiceChannel, video);
+        const video = await queryVideo(args.join(" "));
+        const voiceChannel = await member.voice.channel.fetch();
+        const result = player.play(voiceChannel as VoiceChannel, video);
 
-            if (result === PlayResult.Play) {
-                const embed = videoToEmbed(video, {
-                    title: `Currently playing: ${video.title}`,
-                });
-                await message.channel.send({ embeds: [embed] });
-            } else if (result === PlayResult.Enqueue) {
-                await message.channel.send(
-                    `${video.title} is added to the queue.`
-                );
-            }
-        } catch (error) {
-            await message.channel.send("An error occurred playing a song.");
+        if (result === PlayResult.Play) {
+            const embed = videoToEmbed(video, {
+                title: `Currently playing: ${video.title}`,
+            });
+            await message.channel.send({ embeds: [embed] });
+        } else if (result === PlayResult.Enqueue) {
+            await message.channel.send(`${video.title} is added to the queue.`);
         }
     }
 }

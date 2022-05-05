@@ -27,6 +27,10 @@ export abstract class Command {
     }
 
     abstract run(context: CommandContext, args: string[]): Promise<void>;
+
+    handleError(error: Error): void {
+        logger.error(`Error in command ${this.name}: ${error.message}`);
+    }
 }
 
 class HelpCommand extends Command {
@@ -101,14 +105,20 @@ export class CommandDispatcher {
             this.commands.get(cmd.toLocaleLowerCase()) ||
             this.aliases.get(cmd.toLocaleLowerCase());
 
-        try {
-            if (command) {
+        if (command) {
+            try {
                 await command.run({ bot, message, guild, member }, args);
-            } else {
-                await this.sendUnknownCommandMessage(cmd, message);
+            } catch (error) {
+                command.handleError(error as Error);
             }
-        } catch (error) {
-            logger.error(`'${error}' occurred while handling ${cmd}`);
+        } else {
+            try {
+                await this.sendUnknownCommandMessage(cmd, message);
+            } catch (error) {
+                logger.error(
+                    `${error} occurred while sending unknown command message.`
+                );
+            }
         }
     }
 
