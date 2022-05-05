@@ -29,26 +29,20 @@ export class SkipCommand extends Command {
             return;
         }
 
-        const errorMessage =
-            "You need to be in the same voice channel with the bot to skip tracks!";
-        // User should be in a voice channel
-        if (!msg.member.voice.channel) {
-            await msg.channel.send(errorMessage);
-            return;
-        }
-
-        const { id: channelId } = msg.member.voice.channel;
-
         // User should be in the same channel with the bot
+        const channelId = msg.member.voice.channel?.id;
         if (player.channelId !== channelId) {
-            await msg.channel.send(errorMessage);
+            await msg.channel.send(
+                "You need to be in the same voice channel with the bot to skip tracks!"
+            );
             return;
         }
 
         try {
-            const { title } = player.skip();
+            const skipped = player.skip();
             if (player.state === PlayerState.Stopped) {
                 await msg.channel.send("No more songs in queue.");
+                return;
             }
             const current = player.nowPlaying();
             if (!current) {
@@ -56,9 +50,8 @@ export class SkipCommand extends Command {
                     "`queue.current` should not be `null` if `queue.state` is not `Stopped`."
                 );
             }
-
             const embed = videoToEmbed(current, {
-                title: `Skipped ${title} and currently playing:`,
+                title: `Skipped ${skipped.title} and currently playing ${current.title}`,
             });
             await msg.channel.send({ embeds: [embed] });
         } catch (error) {

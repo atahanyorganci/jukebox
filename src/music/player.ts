@@ -75,6 +75,9 @@ export default class Player extends EventEmitter {
     }
 
     private stopPlayer(): void {
+        if (this.player.state.status !== AudioPlayerStatus.Idle) {
+            this.player.pause(true);
+        }
         this.state = PlayerState.Stopped;
         this.player = null;
         this.queue.clear();
@@ -136,7 +139,7 @@ export default class Player extends EventEmitter {
     }
 
     stop(): void {
-        throw new Error("Method not implemented.");
+        this.stopPlayer();
     }
 
     setVolume(_volume: number): void {
@@ -154,11 +157,34 @@ export default class Player extends EventEmitter {
         this.state = PlayerState.Playing;
     }
 
-    remove(_index: number): Video {
-        throw new Error("Method not implemented.");
+    remove(index: number): Video {
+        if (index < 0 || index >= this.queue.length) {
+            throw new Error("Index out of range.");
+        }
+        if (index === 0) {
+            return this.skip();
+        }
+        const removed = this.queue.remove(index);
+        if (!removed) {
+            unreachable("Removed resource is null.");
+        }
+        return removed;
     }
 
     skip(): Video {
-        throw new Error("Method not implemented.");
+        const skipped = this.queue.dequeue();
+        if (!skipped) {
+            unreachable("Queue empty when trying to skip.");
+        }
+        if (this.queue.isEmpty) {
+            this.stopPlayer();
+        } else {
+            const current = this.queue.current;
+            if (!current) {
+                unreachable("Queue not empty with no current resource.");
+            }
+            this.player.play(current);
+        }
+        return skipped;
     }
 }
