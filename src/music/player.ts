@@ -7,7 +7,7 @@ import {
     joinVoiceChannel,
     VoiceConnection,
 } from "@discordjs/voice";
-import { Video, videoToAudioResource } from "@music";
+import { Video } from "@music";
 import { VoiceChannel } from "discord.js";
 import EventEmitter from "events";
 import VideoQueue from "@music/queue";
@@ -28,9 +28,7 @@ export enum PlayerState {
 export default class Player extends EventEmitter {
     private _state: PlayerState = PlayerState.Init;
     private _player: AudioPlayer | null = null;
-
-    queue: VideoQueue = new VideoQueue();
-    volume = 1.0;
+    private _queue: VideoQueue = new VideoQueue();
 
     public get state(): PlayerState {
         return this._state;
@@ -38,6 +36,10 @@ export default class Player extends EventEmitter {
 
     private set state(v: PlayerState) {
         this._state = v;
+    }
+
+    get queue(): VideoQueue {
+        return this._queue;
     }
 
     private get player(): AudioPlayer {
@@ -60,18 +62,22 @@ export default class Player extends EventEmitter {
     }
 
     private handlePlayerIdle(): void {
-        const prev = this.queue.dequeue();
-        if (!prev) {
+        const current = this.queue.dequeue();
+        if (!current) {
             unreachable("Player idle without any song in queue!");
         }
         if (this.queue.isEmpty) {
             return this.stopPlayer();
         }
+        const next = this.queue.current;
+        if (!next) unreachable("Queue not empty with no current resource.");
+        this.player.play(next);
     }
 
     private stopPlayer(): void {
         this.state = PlayerState.Stopped;
         this.player = null;
+        this.queue.clear();
         this.emit("stopped");
     }
 
@@ -103,13 +109,19 @@ export default class Player extends EventEmitter {
         const connection = this.getVoiceConnection(channel);
         connection.subscribe(this.player);
 
-        this.player.play(videoToAudioResource(video));
+        const audioResource = this.queue.current;
+        if (!audioResource) {
+            unreachable("No audio resource found after enqueuing.");
+        }
+
+        this.player.play(audioResource);
         this.state = PlayerState.Playing;
         return PlayResult.Play;
     }
 
     nowPlaying(): Video | null {
-        return this.queue.current;
+        const resource = this.queue.current;
+        return resource ? resource.metadata : null;
     }
 
     pause(): void {
