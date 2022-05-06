@@ -96,9 +96,13 @@ export class CommandDispatcher {
         const [cmd, ...args] = content.slice(PREFIX.length).trim().split(/ +/);
 
         if (args.length !== 0) {
-            logger.info(`Received command "${cmd}" with [${args.join(", ")}]`);
+            logger.debug(
+                `Received command ${cmd} with args ${args} from ${author.id} in ${guild.id}`
+            );
         } else {
-            logger.info(`Received command "${cmd}"`);
+            logger.debug(
+                `Received command ${cmd} from ${author.id} in ${guild.id}`
+            );
         }
 
         const command =

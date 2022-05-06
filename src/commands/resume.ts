@@ -1,5 +1,4 @@
 import { Command, CommandContext } from "@commands";
-import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 
 export class ResumeCommand extends Command {
@@ -42,8 +41,6 @@ export class ResumeCommand extends Command {
         }
 
         player.resume();
-        logger.info("Streaming resumed.");
-
         await message.channel.send("Streaming resumed.");
     }
 }

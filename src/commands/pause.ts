@@ -37,7 +37,6 @@ export class PauseCommand extends Command {
         }
 
         player.pause();
-        logger.info("Streaming paused.");
         await message.channel.send("Streaming paused.");
     }
 }

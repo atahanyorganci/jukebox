@@ -1,5 +1,4 @@
 import { Command, CommandContext } from "@commands";
-import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 
 export class VolumeCommand extends Command {
@@ -50,6 +49,5 @@ export class VolumeCommand extends Command {
 
         player.setVolume(volume / 100);
         await message.channel.send(`Volume set to ${volume}%.`);
-        logger.info(`Volume set to ${volume}%.`);
     }
 }
