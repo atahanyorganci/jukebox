@@ -1,13 +1,14 @@
 import {
     AudioPlayer,
     AudioPlayerStatus,
+    AudioResource,
     createAudioPlayer,
     DiscordGatewayAdapterCreator,
     getVoiceConnection,
     joinVoiceChannel,
     VoiceConnection,
 } from "@discordjs/voice";
-import { Video } from "@music";
+import { Video, videoToAudioResource } from "@music";
 import { VoiceChannel } from "discord.js";
 import EventEmitter from "events";
 import VideoQueue from "@music/queue";
@@ -25,12 +26,41 @@ export enum PlayerState {
     Stopped,
 }
 
+export class InvalidStateError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "InvalidStateError";
+    }
+}
+
+export class PlayerInitError extends InvalidStateError {
+    constructor() {
+        super("Player state isn't init and current audio resource is null");
+        this.name = "FailedToInitializeError";
+    }
+}
+
 export default class Player extends EventEmitter {
     private _state: PlayerState = PlayerState.Init;
     private _player: AudioPlayer | null = null;
     private _queue: VideoQueue = new VideoQueue();
+    private _nowPlaying: AudioResource<Video> | null = null;
+    private _volume = 0.25;
 
-    public get state(): PlayerState {
+    constructor(public guildId: string, public channelId: string) {
+        super();
+        this.player.on(AudioPlayerStatus.Idle, () => this.handlePlayerIdle());
+    }
+
+    get volume(): number {
+        return this._volume;
+    }
+
+    private set volume(volume: number) {
+        this._volume = volume;
+    }
+
+    get state(): PlayerState {
         return this._state;
     }
 
@@ -40,6 +70,17 @@ export default class Player extends EventEmitter {
 
     get queue(): VideoQueue {
         return this._queue;
+    }
+
+    get isPlaying(): boolean {
+        return this.state === PlayerState.Playing;
+    }
+
+    get nowPlaying(): Video {
+        if (!this._nowPlaying) {
+            throw new PlayerInitError();
+        }
+        return this._nowPlaying.metadata;
     }
 
     private get player(): AudioPlayer {
@@ -56,36 +97,31 @@ export default class Player extends EventEmitter {
         this._player = player;
     }
 
-    constructor(public guildId: string, public channelId: string) {
-        super();
-        this.player.on(AudioPlayerStatus.Idle, () => this.handlePlayerIdle());
-    }
-
     private handlePlayerIdle(): void {
-        const current = this.queue.dequeue();
-        if (!current) {
-            unreachable("Player idle without any song in queue!");
-        }
         if (this.queue.isEmpty) {
             return this.stopPlayer();
         }
-        const next = this.queue.current;
+        const next = this.queue.dequeue();
         if (!next) unreachable("Queue not empty with no current resource.");
-        this.player.play(next);
+        this.playVideo(next);
+    }
+
+    private playVideo(video: Video): void {
+        const audioResource = videoToAudioResource(video, this._volume);
+        this._nowPlaying = audioResource;
+        this.player.play(audioResource);
+        this.state = PlayerState.Playing;
     }
 
     private stopPlayer(): void {
         if (this.player.state.status !== AudioPlayerStatus.Idle) {
             this.player.pause(true);
         }
+        this._nowPlaying = null;
         this.state = PlayerState.Stopped;
         this.player = null;
         this.queue.clear();
         this.emit("stopped");
-    }
-
-    public get isPlaying(): boolean {
-        return this.state === PlayerState.Playing;
     }
 
     private getVoiceConnection(channel: VoiceChannel): VoiceConnection {
@@ -105,26 +141,14 @@ export default class Player extends EventEmitter {
     }
 
     play(channel: VoiceChannel, video: Video): PlayResult {
-        this.queue.enqueue(video);
         if (this.state !== PlayerState.Init) {
+            this.queue.enqueue(video);
             return PlayResult.Enqueue;
         }
         const connection = this.getVoiceConnection(channel);
         connection.subscribe(this.player);
-
-        const audioResource = this.queue.current;
-        if (!audioResource) {
-            unreachable("No audio resource found after enqueuing.");
-        }
-
-        this.player.play(audioResource);
-        this.state = PlayerState.Playing;
+        this.playVideo(video);
         return PlayResult.Play;
-    }
-
-    nowPlaying(): Video | null {
-        const resource = this.queue.current;
-        return resource ? resource.metadata : null;
     }
 
     pause(): void {
@@ -142,8 +166,15 @@ export default class Player extends EventEmitter {
         this.stopPlayer();
     }
 
-    setVolume(_volume: number): void {
-        throw new Error("Method not implemented.");
+    setVolume(volume: number): void {
+        if (volume < 0 || volume > 1) {
+            throw new Error("Volume must be between 0 and 1.");
+        }
+        if (!this._nowPlaying) {
+            throw new PlayerInitError();
+        }
+        this._volume = volume;
+        this._nowPlaying.volume?.setVolume(volume);
     }
 
     resume(): void {
@@ -172,19 +203,17 @@ export default class Player extends EventEmitter {
     }
 
     skip(): Video {
-        const skipped = this.queue.dequeue();
-        if (!skipped) {
-            unreachable("Queue empty when trying to skip.");
+        if (!this._nowPlaying) {
+            throw new PlayerInitError();
         }
+        const skipped = this._nowPlaying.metadata;
         if (this.queue.isEmpty) {
             this.stopPlayer();
-        } else {
-            const current = this.queue.current;
-            if (!current) {
-                unreachable("Queue not empty with no current resource.");
-            }
-            this.player.play(current);
+            return skipped;
         }
+        const current = this.queue.dequeue();
+        if (!current) unreachable("Queue not empty with no current resource.");
+        this.playVideo(current);
         return skipped;
     }
 }

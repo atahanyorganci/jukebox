@@ -24,15 +24,14 @@ export class NowPlayingCommand extends Command {
 
         const jukebox = JukeBox.the();
         const player = jukebox.getPlayer(guild.id);
-        const current = player?.nowPlaying();
 
-        if (!current) {
+        if (!player) {
             await message.channel.send("Bot is not currently playing.");
             return;
         }
 
-        logger.info(`Currently playing ${current.title}.`);
-        const embed = videoToEmbed(current);
+        logger.info(`Currently playing ${player.nowPlaying.title}.`);
+        const embed = videoToEmbed(player.nowPlaying);
         await message.channel.send({ embeds: [embed] });
     }
 }

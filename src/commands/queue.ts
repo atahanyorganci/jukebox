@@ -25,18 +25,17 @@ export class QueueCommand extends Command {
             return;
         }
 
-        const lines = player.queue.map(({ title }, index) => {
-            if (index === 0) {
-                return `Currently playing ${title}`;
-            }
-            return `${index}. ${title}`;
+        const current = `Currently playing ${player.nowPlaying.title}`;
+        const queue = player.queue.map(({ title }, index) => {
+            return `${index + 1}. ${title}`;
         });
-        const description = lines.join("\n");
+        const description = [current, ...queue].join("\n");
 
-        const embed = new MessageEmbed()
-            .setTitle("Music Queue")
-            .setDescription(description)
-            .setColor("#123123");
+        const embed = new MessageEmbed({
+            title: "Song Queue",
+            description,
+            color: "#123123",
+        });
 
         await message.channel.send({ embeds: [embed] });
     }

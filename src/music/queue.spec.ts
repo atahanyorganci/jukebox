@@ -34,7 +34,6 @@ const VIDEOS = [
 test("Default queue should be empty", () => {
     const queue = new VideoQueue();
     expect(queue.isEmpty).toBeTruthy();
-    expect(queue.current).toBeNull();
 });
 
 test("Queue length should 1 after adding a single video", () => {
@@ -43,7 +42,6 @@ test("Queue length should 1 after adding a single video", () => {
 
     expect(queue.isEmpty).toBeFalsy();
     expect(queue.length).toBe(1);
-    expect(queue.current).toBeTruthy();
 });
 
 test("Queue length should 2 after adding two videos", () => {
@@ -70,7 +68,6 @@ test("Queue length should decrease after removing a video", () => {
     }
 
     expect(queue.isEmpty).toBeTruthy();
-    expect(queue.current).toBeNull();
     expect(queue.length).toBe(0);
 });
 
@@ -82,11 +79,9 @@ test("Queue should be empty after clearing", () => {
 
     expect(queue.isEmpty).toBeFalsy();
     expect(queue.length).toBe(VIDEOS.length);
-    expect(queue.current).toBeTruthy();
 
     queue.clear();
 
     expect(queue.isEmpty).toBeTruthy();
     expect(queue.length).toBe(0);
-    expect(queue.current).toBeNull();
 });

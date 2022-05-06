@@ -37,19 +37,19 @@ export class SkipCommand extends Command {
             return;
         }
 
-        const skipped = player.skip();
+        const { title } = player.skip();
         if (player.state === PlayerState.Stopped) {
             await message.channel.send("No more songs in queue.");
             return;
         }
-        const current = player.nowPlaying();
+        const current = player.nowPlaying;
         if (!current) {
             unreachable(
                 "`queue.current` should not be `null` if `queue.state` is not `Stopped`."
             );
         }
         const embed = videoToEmbed(current, {
-            title: `Skipped ${skipped.title} and currently playing ${current.title}`,
+            title: `Skipped ${title} and currently playing ${current.title}`,
         });
         await message.channel.send({ embeds: [embed] });
     }
