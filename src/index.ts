@@ -38,7 +38,9 @@ const handler = new DispatcherBuilder()
 bot.once("ready", () => {
     logger.info("Bot is ready.");
 });
-bot.on("messageCreate", msg => {
-    handler.handle(bot, msg);
+bot.on("messageCreate", async msg => {
+    await handler.handle(bot, msg);
 });
-bot.login(BOT_TOKEN);
+bot.login(BOT_TOKEN).catch(err => {
+    logger.error(`Failed to start, error ${err}`);
+});
