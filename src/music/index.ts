@@ -3,6 +3,7 @@ import { google } from "googleapis";
 import { API_KEY } from "@config";
 import { AudioResource, createAudioResource } from "@discordjs/voice";
 import ytdl from "ytdl-core";
+import { unreachable } from "@util";
 
 export const YouTube = google.youtube({
     version: "v3",
@@ -26,22 +27,28 @@ export class InvalidYouTubeUrlError extends Error {
     }
 }
 
+export class NoResultsError extends Error {
+    constructor() {
+        super("No results found!");
+    }
+}
+
 export async function getVideoById(id: string): Promise<Video> {
     const { data } = await YouTube.videos.list({
         id: [id],
         part: ["snippet"],
     });
     if (!data.items || data.items.length === 0) {
-        throw new Error("No results found.");
+        throw new NoResultsError();
     }
     const { snippet } = data.items[0];
-    if (!id || !snippet) {
-        throw new Error("No results found.");
+    if (!snippet) {
+        unreachable();
     }
 
     const { channelTitle, title, description, thumbnails } = snippet;
     if (!channelTitle || !title || !description || !thumbnails?.default?.url) {
-        throw new Error("No results found.");
+        unreachable();
     }
     return {
         id,
@@ -59,12 +66,12 @@ export async function queryVideo(query: string): Promise<Video> {
         q: query,
     });
     if (!list.data.items || list.data.items.length === 0) {
-        throw new Error("No results found.");
+        throw new NoResultsError();
     }
 
     const { id, snippet } = list.data.items[0];
     if (!id || !snippet) {
-        throw new Error("No results found.");
+        unreachable();
     }
 
     const { channelTitle, title, description, thumbnails } = snippet;
@@ -75,7 +82,7 @@ export async function queryVideo(query: string): Promise<Video> {
         !description ||
         !thumbnails?.default?.url
     ) {
-        throw new Error("No results found.");
+        unreachable();
     }
 
     return {
