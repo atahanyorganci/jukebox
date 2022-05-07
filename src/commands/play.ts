@@ -48,10 +48,10 @@ export class PlayCommand extends Command {
             player = jukeBox.createPlayer(guild.id, channelId);
         }
 
-        let video: Video | null;
+        let resource: Video[] | Video | null;
         try {
-            video = await fetchYouTubeResource(args);
-            if (!video) {
+            resource = await fetchYouTubeResource(args);
+            if (!resource) {
                 await message.channel.send("No results found!");
                 return;
             }
@@ -63,15 +63,24 @@ export class PlayCommand extends Command {
         }
 
         const voiceChannel = await member.voice.channel.fetch();
-        const result = player.play(voiceChannel as VoiceChannel, video);
 
-        if (result === PlayResult.Play) {
-            const embed = videoToEmbed(video, {
-                title: `Currently playing: ${video.title}`,
-            });
-            await message.channel.send({ embeds: [embed] });
-        } else if (result === PlayResult.Enqueue) {
-            await message.channel.send(`${video.title} is added to the queue.`);
+        if (resource instanceof Array) {
+            player.playPlaylist(voiceChannel as VoiceChannel, resource);
+            await message.channel.send(
+                `Added ${resource.length} songs to queue!`
+            );
+        } else {
+            const result = player.play(voiceChannel as VoiceChannel, resource);
+            if (result === PlayResult.Play) {
+                const embed = videoToEmbed(resource, {
+                    title: `Currently playing: ${resource.title}`,
+                });
+                await message.channel.send({ embeds: [embed] });
+            } else if (result === PlayResult.Enqueue) {
+                await message.channel.send(
+                    `${resource.title} is added to the queue.`
+                );
+            }
         }
     }
 }

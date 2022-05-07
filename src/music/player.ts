@@ -151,6 +151,13 @@ export default class Player extends EventEmitter {
         return PlayResult.Play;
     }
 
+    playPlaylist(channel: VoiceChannel, playlist: Video[]): PlayResult {
+        const [first, ...rest] = playlist;
+        const result = this.play(channel, first);
+        rest.forEach(video => this.queue.enqueue(video));
+        return result;
+    }
+
     pause(): void {
         if (!this.isPlaying) {
             return;

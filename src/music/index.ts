@@ -59,6 +59,41 @@ export async function getVideoById(id: string): Promise<Video> {
     };
 }
 
+export async function getPlaylistById(playlistId: string): Promise<Video[]> {
+    const { data } = await YouTube.playlistItems.list({
+        playlistId,
+        part: ["contentDetails", "snippet"],
+        maxResults: 25,
+    });
+    if (!data.items || data.items.length === 0) {
+        throw new NoResultsError();
+    }
+    const videos = data.items.map(item => {
+        const { contentDetails, snippet } = item;
+        if (!snippet || !contentDetails) {
+            unreachable();
+        }
+        const { channelTitle, title, description, thumbnails } = snippet;
+        if (
+            !contentDetails.videoId ||
+            !channelTitle ||
+            !title ||
+            !description ||
+            !thumbnails?.default?.url
+        ) {
+            unreachable();
+        }
+        return {
+            id: contentDetails.videoId,
+            channel: channelTitle,
+            title,
+            description,
+            thumbnail: thumbnails.default.url,
+        };
+    });
+    return videos;
+}
+
 export async function queryVideo(query: string): Promise<Video> {
     const list = await YouTube.search.list({
         part: ["id", "snippet"],
@@ -123,7 +158,9 @@ function parseYouTubeUrl(url: string): YouTubeResourceFragment | null {
     }
 }
 
-async function fetchResourceFromUrl(url: string): Promise<null | Video> {
+async function fetchResourceFromUrl(
+    url: string
+): Promise<null | Video | Video[]> {
     const resource = parseYouTubeUrl(url);
     if (!resource) return null;
     const { id, type } = resource;
@@ -131,13 +168,13 @@ async function fetchResourceFromUrl(url: string): Promise<null | Video> {
         case "video":
             return await getVideoById(id);
         case "playlist":
-            throw new Error("Playlist feature isn't implemented");
+            return await getPlaylistById(id);
     }
 }
 
 export async function fetchYouTubeResource(
     args: string[]
-): Promise<null | Video> {
+): Promise<null | Video | Video[]> {
     if (args.length === 1) {
         const resource = await fetchResourceFromUrl(args[0]);
         if (resource) return resource;
