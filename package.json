@@ -10,6 +10,7 @@
     "scripts": {
         "lint": "eslint --fix src/**/*.ts src/*.ts",
         "build": "tsc",
+        "build:watch": "tsc --watch",
         "start": "yarn build && node dist",
         "prepare": "ts-patch install -s",
         "test": "jest"
