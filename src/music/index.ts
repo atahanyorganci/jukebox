@@ -4,11 +4,13 @@ import { API_KEY } from "@config";
 import { AudioResource, createAudioResource } from "@discordjs/voice";
 import ytdl from "ytdl-core";
 
-export const youtube = google.youtube("v3");
+export const YouTube = google.youtube({
+    version: "v3",
+    auth: API_KEY,
+});
 
 export async function queryVideo(query: string): Promise<Video> {
-    const list = await youtube.search.list({
-        auth: API_KEY,
+    const list = await YouTube.search.list({
         part: ["id", "snippet"],
         maxResults: 1,
         q: query,
