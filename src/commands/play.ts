@@ -1,5 +1,5 @@
 import { Command, CommandContext } from "@commands";
-import { queryVideo, videoToEmbed } from "@music";
+import { Video, fetchYouTubeResource, videoToEmbed } from "@music";
 import JukeBox from "@music/jukebox";
 import { PlayResult } from "@music/player";
 import { VoiceChannel } from "discord.js";
@@ -48,7 +48,20 @@ export class PlayCommand extends Command {
             player = jukeBox.createPlayer(guild.id, channelId);
         }
 
-        const video = await queryVideo(args.join(" "));
+        let video: Video | null;
+        try {
+            video = await fetchYouTubeResource(args);
+            if (!video) {
+                await message.channel.send("No results found!");
+                return;
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                await message.channel.send(`${error.message}`);
+            }
+            return;
+        }
+
         const voiceChannel = await member.voice.channel.fetch();
         const result = player.play(voiceChannel as VoiceChannel, video);
 
