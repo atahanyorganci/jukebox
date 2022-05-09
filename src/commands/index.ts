@@ -1,6 +1,7 @@
 import { Client, Guild, GuildMember, Message, MessageEmbed } from "discord.js";
 import { PREFIX } from "@config";
 import { logger } from "@logger";
+import { inlineCode } from "@discordjs/builders";
 
 export interface CommandOptions {
     name: string;
@@ -131,8 +132,10 @@ export class CommandDispatcher {
     }
 
     async sendUnknownCommandMessage(cmd: string, msg: Message): Promise<void> {
+        const invalid = inlineCode(`${PREFIX}${cmd}`);
+        const help = inlineCode(`${PREFIX}help`);
         await msg.channel.send(
-            `\`${PREFIX}${cmd}\` is not a valid command, use \`${PREFIX}help\` to view available commands.`
+            `${invalid} is not a valid command, use ${help} to view available commands.`
         );
     }
 }

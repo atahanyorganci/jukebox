@@ -1,4 +1,5 @@
 import { Command, CommandContext } from "@commands";
+import { italic } from "@discordjs/builders";
 import { Video, fetchYouTubeResource, videoToEmbed } from "@music";
 import JukeBox from "@music/jukebox";
 import { PlayResult } from "@music/player";
@@ -73,12 +74,12 @@ export class PlayCommand extends Command {
             const result = player.play(voiceChannel as VoiceChannel, resource);
             if (result === PlayResult.Play) {
                 const embed = videoToEmbed(resource, {
-                    title: `Currently playing: ${resource.title}`,
+                    title: `Playing ${italic(resource.title)}`,
                 });
                 await message.channel.send({ embeds: [embed] });
             } else if (result === PlayResult.Enqueue) {
                 await message.channel.send(
-                    `${resource.title} is added to the queue.`
+                    `${italic(resource.title)} is added to the queue.`
                 );
             }
         }

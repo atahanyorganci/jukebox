@@ -1,5 +1,4 @@
 import { Command, CommandContext } from "@commands";
-import { logger } from "@logger";
 import JukeBox from "@music/jukebox";
 
 export class PauseCommand extends Command {

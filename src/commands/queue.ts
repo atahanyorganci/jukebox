@@ -1,6 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { Command, CommandContext } from "@commands";
 import JukeBox from "@music/jukebox";
+import { bold, italic } from "@discordjs/builders";
 
 export class QueueCommand extends Command {
     constructor() {
@@ -25,14 +26,14 @@ export class QueueCommand extends Command {
             return;
         }
 
-        const current = `Currently playing ${player.nowPlaying.title}`;
         const queue = player.queue.map(({ title }, index) => {
-            return `${index + 1}. ${title}`;
+            const number = bold(`${index + 1}.`);
+            return `${number} ${italic(title)}`;
         });
-        const description = [current, ...queue].join("\n");
+        const description = queue.join("\n");
 
         const embed = new MessageEmbed({
-            title: "Song Queue",
+            title: `Currently playing ${italic(player.nowPlaying.title)}`,
             description,
             color: "#123123",
         });

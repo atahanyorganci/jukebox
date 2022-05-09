@@ -1,6 +1,7 @@
 import { Command, CommandContext } from "@commands";
 import JukeBox from "@music/jukebox";
 import { videoToEmbed } from "@music";
+import { italic } from "@discordjs/builders";
 
 export class RemoveCommand extends Command {
     constructor() {
@@ -42,7 +43,7 @@ export class RemoveCommand extends Command {
 
         const video = player.remove(index);
         const embed = videoToEmbed(video, {
-            title: `Removed '${video.title}' from queue`,
+            title: `Removed ${italic(video.title)} from queue`,
         });
         await message.channel.send({ embeds: [embed] });
     }

@@ -1,6 +1,7 @@
 import { Command, CommandContext } from "@commands";
 import JukeBox from "@music/jukebox";
 import { videoToEmbed } from "@music";
+import { italic } from "@discordjs/builders";
 
 export class NowPlayingCommand extends Command {
     constructor() {
@@ -28,7 +29,9 @@ export class NowPlayingCommand extends Command {
             return;
         }
 
-        const embed = videoToEmbed(player.nowPlaying);
+        const embed = videoToEmbed(player.nowPlaying, {
+            title: `Playing ${italic(player.nowPlaying.title)}`,
+        });
         await message.channel.send({ embeds: [embed] });
     }
 }

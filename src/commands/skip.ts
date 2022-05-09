@@ -3,6 +3,7 @@ import JukeBox from "@music/jukebox";
 import { PlayerState } from "@music/player";
 import { videoToEmbed } from "@music";
 import { unreachable } from "@util";
+import { italic } from "@discordjs/builders";
 
 export class SkipCommand extends Command {
     constructor() {
@@ -37,7 +38,7 @@ export class SkipCommand extends Command {
             return;
         }
 
-        const { title } = player.skip();
+        const skipped = player.skip();
         if (player.state === PlayerState.Stopped) {
             await message.channel.send("No more songs in queue.");
             return;
@@ -48,8 +49,10 @@ export class SkipCommand extends Command {
                 "`queue.current` should not be `null` if `queue.state` is not `Stopped`."
             );
         }
+        const skippedTitle = italic(skipped.title);
+        const currentTitle = italic(current.title);
         const embed = videoToEmbed(current, {
-            title: `Skipped ${title} and currently playing ${current.title}`,
+            title: `Skipped ${skippedTitle} and playing ${currentTitle}`,
         });
         await message.channel.send({ embeds: [embed] });
     }
