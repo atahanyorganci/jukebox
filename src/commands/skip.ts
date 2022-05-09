@@ -1,7 +1,6 @@
 import { Command, CommandContext } from "@commands";
 import JukeBox from "@music/jukebox";
 import { PlayerState } from "@music/player";
-import { videoToEmbed } from "@music";
 import { unreachable } from "@util";
 import { italic } from "@discordjs/builders";
 
@@ -51,9 +50,9 @@ export class SkipCommand extends Command {
         }
         const skippedTitle = italic(skipped.title);
         const currentTitle = italic(current.title);
-        const embed = videoToEmbed(current, {
-            title: `Skipped ${skippedTitle} and playing ${currentTitle}`,
-        });
+        const embed = current
+            .toEmbed()
+            .setTitle(`Skipped ${skippedTitle}, playing ${currentTitle}`);
         await message.channel.send({ embeds: [embed] });
     }
 }

@@ -1,5 +1,5 @@
 import { Command, CommandContext } from "@commands";
-import { queryVideo, videoToEmbed } from "../music";
+import { queryVideo } from "../music";
 
 export class SearchVideoCommand extends Command {
     constructor() {
@@ -13,7 +13,7 @@ export class SearchVideoCommand extends Command {
     async run({ message }: CommandContext, args: string[]): Promise<void> {
         const videoName = args.join(" ");
         const video = await queryVideo(videoName);
-        const embed = videoToEmbed(video);
+        const embed = video.toEmbed();
         await message.channel.send({ embeds: [embed] });
     }
 }

@@ -1,3 +1,4 @@
+import { Video } from "@music";
 import VideoQueue from "@music/queue";
 
 const VIDEOS = [
@@ -29,7 +30,10 @@ const VIDEOS = [
         thumbnail: "thumbnail.jpg",
         channel: "Channel 4",
     },
-];
+].map(
+    ({ id, title, description, thumbnail, channel }) =>
+        new Video(id, title, description, channel, thumbnail)
+);
 
 test("Default queue should be empty", () => {
     const queue = new VideoQueue();

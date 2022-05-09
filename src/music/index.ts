@@ -3,7 +3,6 @@ import { google } from "googleapis";
 import { API_KEY } from "@config";
 import { AudioResource, createAudioResource } from "@discordjs/voice";
 import ytdl from "ytdl-core";
-import { unreachable } from "@util";
 
 export const YouTube = google.youtube({
     version: "v3",
@@ -43,20 +42,20 @@ export async function getVideoById(id: string): Promise<Video> {
     }
     const { snippet } = data.items[0];
     if (!snippet) {
-        unreachable();
+        throw new NoResultsError();
     }
 
     const { channelTitle, title, description, thumbnails } = snippet;
     if (!channelTitle || !title || !description || !thumbnails?.default?.url) {
-        unreachable();
+        throw new NoResultsError();
     }
-    return {
+    return new Video(
         id,
-        channel: channelTitle,
         title,
         description,
-        thumbnail: thumbnails.default.url,
-    };
+        channelTitle,
+        thumbnails.default.url
+    );
 }
 
 export async function getPlaylistById(playlistId: string): Promise<Video[]> {
@@ -71,7 +70,7 @@ export async function getPlaylistById(playlistId: string): Promise<Video[]> {
     const videos = data.items.map(item => {
         const { contentDetails, snippet } = item;
         if (!snippet || !contentDetails) {
-            unreachable();
+            throw new NoResultsError();
         }
         const { channelTitle, title, description, thumbnails } = snippet;
         if (
@@ -81,15 +80,15 @@ export async function getPlaylistById(playlistId: string): Promise<Video[]> {
             !description ||
             !thumbnails?.default?.url
         ) {
-            unreachable();
+            throw new NoResultsError();
         }
-        return {
-            id: contentDetails.videoId,
-            channel: channelTitle,
+        return new Video(
+            contentDetails.videoId,
             title,
             description,
-            thumbnail: thumbnails.default.url,
-        };
+            channelTitle,
+            thumbnails.default.url
+        );
     });
     return videos;
 }
@@ -106,7 +105,7 @@ export async function queryVideo(query: string): Promise<Video> {
 
     const { id, snippet } = list.data.items[0];
     if (!id || !snippet) {
-        unreachable();
+        throw new NoResultsError();
     }
 
     const { channelTitle, title, description, thumbnails } = snippet;
@@ -117,16 +116,16 @@ export async function queryVideo(query: string): Promise<Video> {
         !description ||
         !thumbnails?.default?.url
     ) {
-        unreachable();
+        throw new NoResultsError();
     }
 
-    return {
-        id: id.videoId,
+    return new Video(
+        id.videoId,
         title,
         description,
-        channel: channelTitle,
-        thumbnail: thumbnails.default.url,
-    };
+        channelTitle,
+        thumbnails.default.url
+    );
 }
 
 function parseYouTubeUrl(url: string): YouTubeResourceFragment | null {
@@ -182,26 +181,39 @@ export async function fetchYouTubeResource(
     return await queryVideo(args.join(" "));
 }
 
-export interface Video {
-    id: string;
-    title: string;
-    description: string;
-    channel: string;
-    thumbnail: string;
-}
+export class Video {
+    constructor(
+        public readonly id: string,
+        public readonly title: string,
+        public readonly description: string,
+        public readonly channel: string,
+        public readonly thumbnail: string
+    ) {}
 
-export function videoToEmbed(video: Video, opt?: Partial<Video>): MessageEmbed {
-    opt = opt || {};
-    const { title, description, channel, thumbnail } = { ...video, ...opt };
-    return new MessageEmbed()
-        .setTitle(title)
-        .setDescription(description)
-        .addField("Channel", channel)
-        .setImage(thumbnail);
-}
+    get url(): string {
+        return `https://www.youtube.com/watch?v=${this.id}`;
+    }
 
-export function videoUrl({ id }: Video): string {
-    return `https://www.youtube.com/watch?v=${id}`;
+    toEmbed(): MessageEmbed {
+        const { title, channel, thumbnail } = { ...this };
+        const description =
+            this.description.length > 280
+                ? `${this.description.slice(0, 280)}...`
+                : this.description;
+        return new MessageEmbed({
+            title,
+            description,
+            thumbnail: { url: thumbnail },
+            url: this.url,
+            fields: [
+                {
+                    name: "Channel",
+                    value: channel,
+                    inline: true,
+                },
+            ],
+        });
+    }
 }
 
 /**
@@ -220,8 +232,7 @@ export function videoToAudioResource(
     }
     volume = volume || 0.25;
 
-    const url = videoUrl(video);
-    const stream = ytdl(url, {
+    const stream = ytdl(video.url, {
         filter: "audioonly",
     });
     const resource = createAudioResource(stream, {
