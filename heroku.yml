@@ -1,5 +1,0 @@
-build:
-  docker:
-    bot: Dockerfile
-run:
-  bot: node dist
