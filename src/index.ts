@@ -1,4 +1,4 @@
-import { Client, Intents } from "discord.js";
+import { Client, IntentsBitField } from "discord.js";
 import { DispatcherBuilder } from "@commands";
 import { StopCommand } from "@commands/stop";
 import { InfoCommand } from "@commands/info";
@@ -16,9 +16,10 @@ import { logger } from "@logger";
 
 export const bot = new Client({
     intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_VOICE_STATES,
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.GuildVoiceStates,
+        IntentsBitField.Flags.MessageContent,
     ],
 });
 

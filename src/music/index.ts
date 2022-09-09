@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { google } from "googleapis";
 import { API_KEY } from "@config";
 import { AudioResource, createAudioResource } from "@discordjs/voice";
@@ -194,16 +194,19 @@ export class Video {
         return `https://www.youtube.com/watch?v=${this.id}`;
     }
 
-    toEmbed(): MessageEmbed {
+    toEmbed(): EmbedBuilder {
         const { title, channel, thumbnail } = { ...this };
         const description =
             this.description.length > 280
                 ? `${this.description.slice(0, 280)}...`
                 : this.description;
-        return new MessageEmbed({
+
+        return new EmbedBuilder({
             title,
             description,
-            thumbnail: { url: thumbnail },
+            thumbnail: {
+                url: thumbnail,
+            },
             url: this.url,
             fields: [
                 {

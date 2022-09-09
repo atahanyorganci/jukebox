@@ -1,4 +1,4 @@
-import { Client, Message, MessageEmbed } from "discord.js";
+import { Client, Message, EmbedBuilder } from "discord.js";
 import { Command, CommandContext } from "@commands";
 
 export class InfoCommand extends Command {
@@ -34,12 +34,20 @@ export class InfoCommand extends Command {
     async sendBotInfo(bot: Client, msg: Message): Promise<void> {
         if (!bot.user) return;
         const icon = bot.user.displayAvatarURL();
-        const response = new MessageEmbed()
+        const response = new EmbedBuilder()
             .setDescription("Bot Information")
             .setColor("#123123")
             .setThumbnail(icon)
-            .addField("Bot Name:", bot.user.username)
-            .addField("Created On", bot.user.createdAt.toLocaleDateString());
+            .addFields(
+                {
+                    name: "Bot Name",
+                    value: bot.user.username,
+                },
+                {
+                    name: "Created On",
+                    value: bot.user.createdAt.toLocaleDateString(),
+                }
+            );
         await msg.channel.send({ embeds: [response] });
     }
 
@@ -49,17 +57,19 @@ export class InfoCommand extends Command {
         const createdAt = guild.createdAt.toLocaleDateString();
         const memberCount = guild.memberCount.toString();
 
-        const response = new MessageEmbed()
+        const response = new EmbedBuilder()
             .setDescription("Server Information")
             .setColor("#123123")
-            .addField("Server Name:", guild.name)
-            .addField("Created On", createdAt)
-            .addField("Member count", memberCount);
+            .addFields(
+                { name: "Server Name:", value: guild.name },
+                { name: "Created On", value: createdAt },
+                { name: "Member count", value: memberCount }
+            );
         if (guild.icon) response.setThumbnail(guild.icon);
         if (member.joinedAt) {
             const joinedAt = member.joinedAt.toLocaleDateString();
-            response.addField("You Joined At", joinedAt);
+            response.addFields({ name: "You Joined At", value: joinedAt });
         }
-        await msg.channel.send({ embeds: [response] });
+        await msg.channel.send({ embeds: [response.data] });
     }
 }

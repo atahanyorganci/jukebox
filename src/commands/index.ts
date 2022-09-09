@@ -1,4 +1,11 @@
-import { Client, Guild, GuildMember, Message, MessageEmbed } from "discord.js";
+import {
+    Client,
+    Guild,
+    GuildMember,
+    Message,
+    EmbedBuilder,
+    APIEmbed,
+} from "discord.js";
 import { PREFIX } from "@config";
 import { logger } from "@logger";
 import { inlineCode } from "@discordjs/builders";
@@ -35,7 +42,7 @@ export abstract class Command {
 }
 
 class HelpCommand extends Command {
-    response: MessageEmbed;
+    response: APIEmbed;
 
     constructor(commands: Map<string, Command>) {
         super({
@@ -47,23 +54,27 @@ class HelpCommand extends Command {
         this.response = this.buildResponse(commands);
     }
 
-    private buildResponse(commands: Map<string, Command>): MessageEmbed {
-        const response = new MessageEmbed()
+    private buildResponse(commands: Map<string, Command>): APIEmbed {
+        const builder = new EmbedBuilder()
             .setTitle("Available Commands")
             .setColor("#123123");
+
         commands.forEach(({ name, description }) => {
-            if (description)
-                response.addField(`\`${PREFIX}${name}\``, description);
+            if (description) {
+                builder.addFields({
+                    name: inlineCode(`${PREFIX}${name}`),
+                    value: description,
+                });
+            }
         });
-        response.addField(`\`${PREFIX}${this.name}\``, this.description || "");
-        return response;
+        builder.addFields({
+            name: inlineCode(`${PREFIX}${this.name}`),
+            value: this.description || "",
+        });
+        return builder.data;
     }
 
-    async run({ message }: CommandContext, args: string[]): Promise<void> {
-        if (args.length > 0)
-            this.response.setDescription(
-                "Help command doesn't require arguments"
-            );
+    async run({ message }: CommandContext, _args: string[]): Promise<void> {
         await message.channel.send({ embeds: [this.response] });
     }
 }

@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { Command, CommandContext } from "@commands";
 import JukeBox from "@music/jukebox";
 import { bold, italic } from "@discordjs/builders";
@@ -32,11 +32,10 @@ export class QueueCommand extends Command {
         });
         const description = queue.join("\n");
 
-        const embed = new MessageEmbed({
-            title: `Currently playing ${italic(player.nowPlaying.title)}`,
-            description,
-            color: "#123123",
-        });
+        const embed = new EmbedBuilder()
+            .setTitle(`Currently playing ${italic(player.nowPlaying.title)}`)
+            .setDescription(description)
+            .setColor("#123123");
 
         await message.channel.send({ embeds: [embed] });
     }
