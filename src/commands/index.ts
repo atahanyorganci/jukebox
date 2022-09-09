@@ -120,9 +120,11 @@ export class CommandDispatcher {
             try {
                 await this.sendUnknownCommandMessage(cmd, message);
             } catch (error) {
-                logger.error(
-                    `${error} occurred while sending unknown command message.`
-                );
+                if (error instanceof Error) {
+                    logger.error(
+                        `${error} occurred while sending unknown command message from ${error.stack}`
+                    );
+                }
             }
         }
     }
