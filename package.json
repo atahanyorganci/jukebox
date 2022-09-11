@@ -31,7 +31,8 @@
         "libsodium-wrappers": "^0.7.10",
         "opusscript": "^0.0.8",
         "winston": "^3.8.2",
-        "ytdl-core": "^4.11.2"
+        "ytdl-core": "^4.11.2",
+        "zod": "^3.19.0"
     },
     "devDependencies": {
         "@tsconfig/node16": "^1.0.3",

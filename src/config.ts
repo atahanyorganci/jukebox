@@ -1,34 +1,27 @@
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 import { logger } from "@logger";
+import { z } from "zod";
 
-export interface BotConfig {
-    PREFIX: string;
-    BOT_TOKEN: string;
-    API_KEY: string;
-}
+const botConfigSchema = z.object({
+    API_KEY: z.string(),
+    BOT_TOKEN: z.string(),
+    PREFIX: z.string().length(1),
+});
+
+export type BotConfig = z.infer<typeof botConfigSchema>;
+
+export const NODE_ENV = process.env.NODE_ENV || "development";
 
 function config(): BotConfig {
-    try {
+    if (NODE_ENV === "development") {
         dotenv.config();
-    } catch {
-        logger.info("No .env file found, using defaults.");
     }
-    const { BOT_TOKEN, API_KEY, PREFIX } = process.env;
-    if (!BOT_TOKEN) {
-        throw new Error("`BOT_TOKEN` is not set.");
+    const botConfig = botConfigSchema.safeParse(process.env);
+    if (!botConfig.success) {
+        logger.error("Invalid environment variables check your .env file");
+        process.exit(1);
     }
-    if (!API_KEY) {
-        throw new Error("`API_KEY` is not set.");
-    }
-    if (!PREFIX) {
-        throw new Error("`PREFIX` is not set.");
-    }
-    return {
-        PREFIX,
-        BOT_TOKEN,
-        API_KEY,
-    };
+    return botConfig.data;
 }
 
-export default config;
-export const { BOT_TOKEN, API_KEY, PREFIX } = config();
+export const { API_KEY, BOT_TOKEN, PREFIX } = config();
