@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@discordjs/builders': ^1.2.0
   '@discordjs/voice': ^0.11.0
-  '@tsconfig/node16': ^1.0.3
+  '@tsconfig/node18': ^1.0.1
   '@types/jest': ^29.0.0
   '@types/node': ^18.7.16
   '@typescript-eslint/eslint-plugin': ^5.36.2
@@ -41,7 +41,7 @@ dependencies:
   zod: 3.21.4
 
 devDependencies:
-  '@tsconfig/node16': 1.0.3
+  '@tsconfig/node18': 1.0.1
   '@types/jest': 29.5.0
   '@types/node': 18.15.9
   '@typescript-eslint/eslint-plugin': 5.56.0_iskin7c6dxqunwflhstekcjqmq
@@ -859,8 +859,8 @@ packages:
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
     dev: false
 
-  /@tsconfig/node16/1.0.3:
-    resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
+  /@tsconfig/node18/1.0.1:
+    resolution: {integrity: sha512-sNFeK6X2ATlhlvzyH4kKYQlfHXE2f2/wxtB9ClvYXevWpmwkUT7VaSrjIN9E76Qebz8qP5JOJJ9jD3QoD/Z9TA==}
     dev: true
 
   /@types/babel__core/7.20.0:

@@ -38,7 +38,7 @@
         "zod": "^3.19.0"
     },
     "devDependencies": {
-        "@tsconfig/node16": "^1.0.3",
+        "@tsconfig/node18": "^1.0.1",
         "@types/jest": "^29.0.0",
         "@types/node": "^18.7.16",
         "@typescript-eslint/eslint-plugin": "^5.36.2",
@@ -56,7 +56,6 @@
         "typescript-transform-paths": "^3.3.1"
     },
     "volta": {
-        "node": "16.17.0",
-        "yarn": "1.22.19"
+        "node": "18.16.0"
     }
 }
