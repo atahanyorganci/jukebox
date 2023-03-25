@@ -9,18 +9,13 @@ export class StopCommand extends Command {
         });
     }
 
-    async run(
-        { message, guild, member }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, guild, member }: CommandContext, args: string[]): Promise<void> {
         if (!message.member || !message.guild) {
             return;
         }
 
         if (args.length !== 0) {
-            await message.channel.send(
-                "Stop command doesn't require arguments!"
-            );
+            await message.channel.send("Stop command doesn't require arguments!");
         }
 
         const player = JukeBox.the().getPlayer(guild.id);

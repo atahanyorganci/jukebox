@@ -1,6 +1,6 @@
 import { Command, CommandContext } from "@commands";
-import JukeBox from "@music/jukebox";
 import { italic } from "@discordjs/builders";
+import JukeBox from "@music/jukebox";
 
 export class NowPlayingCommand extends Command {
     constructor() {
@@ -10,14 +10,9 @@ export class NowPlayingCommand extends Command {
         });
     }
 
-    async run(
-        { message, guild }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, guild }: CommandContext, args: string[]): Promise<void> {
         if (args.length !== 0) {
-            await message.channel.send(
-                "Now playing command doesn't require arguments!"
-            );
+            await message.channel.send("Now playing command doesn't require arguments!");
             return;
         }
 

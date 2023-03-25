@@ -10,14 +10,9 @@ export class VolumeCommand extends Command {
         });
     }
 
-    async run(
-        { message, guild, member }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, guild, member }: CommandContext, args: string[]): Promise<void> {
         if (args.length !== 1) {
-            await message.channel.send(
-                "You need to provide volume level 0-100."
-            );
+            await message.channel.send("You need to provide volume level 0-100.");
             return;
         }
 

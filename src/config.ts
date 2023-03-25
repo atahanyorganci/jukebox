@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import { logger } from "@logger";
+import dotenv from "dotenv";
 import { z } from "zod";
 
 const botConfigSchema = z.object({

@@ -1,8 +1,8 @@
 import { Command, CommandContext } from "@commands";
+import { italic } from "@discordjs/builders";
 import JukeBox from "@music/jukebox";
 import { PlayerState } from "@music/player";
 import { unreachable } from "@util";
-import { italic } from "@discordjs/builders";
 
 export class SkipCommand extends Command {
     constructor() {
@@ -12,14 +12,9 @@ export class SkipCommand extends Command {
         });
     }
 
-    async run(
-        { message, guild, member }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, guild, member }: CommandContext, args: string[]): Promise<void> {
         if (args.length !== 0) {
-            await message.channel.send(
-                "Skip command doesn't require arguments!"
-            );
+            await message.channel.send("Skip command doesn't require arguments!");
         }
 
         const player = JukeBox.the().getPlayer(guild.id);
@@ -44,9 +39,7 @@ export class SkipCommand extends Command {
         }
         const current = player.nowPlaying;
         if (!current) {
-            unreachable(
-                "`queue.current` should not be `null` if `queue.state` is not `Stopped`."
-            );
+            unreachable("`queue.current` should not be `null` if `queue.state` is not `Stopped`.");
         }
         const skippedTitle = italic(skipped.title);
         const currentTitle = italic(current.title);

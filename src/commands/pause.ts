@@ -9,14 +9,9 @@ export class PauseCommand extends Command {
         });
     }
 
-    async run(
-        { message, guild, member }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, guild, member }: CommandContext, args: string[]): Promise<void> {
         if (args.length !== 0) {
-            await message.channel.send(
-                "Pause command doesn't require arguments!"
-            );
+            await message.channel.send("Pause command doesn't require arguments!");
         }
 
         const jukeBox = JukeBox.the();

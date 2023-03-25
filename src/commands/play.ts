@@ -1,6 +1,6 @@
 import { Command, CommandContext } from "@commands";
 import { italic } from "@discordjs/builders";
-import { Video, fetchYouTubeResource } from "@music";
+import { fetchYouTubeResource, Video } from "@music";
 import JukeBox from "@music/jukebox";
 import { PlayResult } from "@music/player";
 import { VoiceChannel } from "discord.js";
@@ -13,10 +13,7 @@ export class PlayCommand extends Command {
         });
     }
 
-    async run(
-        { message, guild, member }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, guild, member }: CommandContext, args: string[]): Promise<void> {
         if (!message.member || !message.guild) {
             return;
         }
@@ -39,9 +36,7 @@ export class PlayCommand extends Command {
 
         // If a song is currently playing the user should be in same channel with the bot
         if (player && player.channelId !== channelId) {
-            await message.channel.send(
-                "Bot is currently playing in another channel!"
-            );
+            await message.channel.send("Bot is currently playing in another channel!");
             return;
         }
 
@@ -67,20 +62,14 @@ export class PlayCommand extends Command {
 
         if (resource instanceof Array) {
             player.playPlaylist(voiceChannel as VoiceChannel, resource);
-            await message.channel.send(
-                `Added ${resource.length} songs to queue!`
-            );
+            await message.channel.send(`Added ${resource.length} songs to queue!`);
         } else {
             const result = player.play(voiceChannel as VoiceChannel, resource);
             if (result === PlayResult.Play) {
-                const embed = resource
-                    .toEmbed()
-                    .setTitle(`Playing ${italic(resource.title)}`);
+                const embed = resource.toEmbed().setTitle(`Playing ${italic(resource.title)}`);
                 await message.channel.send({ embeds: [embed] });
             } else if (result === PlayResult.Enqueue) {
-                await message.channel.send(
-                    `${italic(resource.title)} is added to the queue.`
-                );
+                await message.channel.send(`${italic(resource.title)} is added to the queue.`);
             }
         }
     }

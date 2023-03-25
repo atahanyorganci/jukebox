@@ -1,14 +1,7 @@
-import {
-    Client,
-    Guild,
-    GuildMember,
-    Message,
-    EmbedBuilder,
-    APIEmbed,
-} from "discord.js";
 import { PREFIX } from "@config";
-import { logger } from "@logger";
 import { inlineCode } from "@discordjs/builders";
+import { logger } from "@logger";
+import { APIEmbed, Client, EmbedBuilder, Guild, GuildMember, Message } from "discord.js";
 
 export interface CommandOptions {
     name: string;
@@ -55,9 +48,7 @@ class HelpCommand extends Command {
     }
 
     private buildResponse(commands: Map<string, Command>): APIEmbed {
-        const builder = new EmbedBuilder()
-            .setTitle("Available Commands")
-            .setColor("#123123");
+        const builder = new EmbedBuilder().setTitle("Available Commands").setColor("#123123");
 
         commands.forEach(({ name, description }) => {
             if (description) {
@@ -112,14 +103,11 @@ export class CommandDispatcher {
                 `Received command ${cmd} with args ${args} from ${author.id} in ${guild.id}`
             );
         } else {
-            logger.debug(
-                `Received command ${cmd} from ${author.id} in ${guild.id}`
-            );
+            logger.debug(`Received command ${cmd} from ${author.id} in ${guild.id}`);
         }
 
         const command =
-            this.commands.get(cmd.toLocaleLowerCase()) ||
-            this.aliases.get(cmd.toLocaleLowerCase());
+            this.commands.get(cmd.toLocaleLowerCase()) || this.aliases.get(cmd.toLocaleLowerCase());
 
         if (command) {
             try {

@@ -1,7 +1,7 @@
-import { EmbedBuilder } from "discord.js";
 import { Command, CommandContext } from "@commands";
-import JukeBox from "@music/jukebox";
 import { bold, italic } from "@discordjs/builders";
+import JukeBox from "@music/jukebox";
+import { EmbedBuilder } from "discord.js";
 
 export class QueueCommand extends Command {
     constructor() {
@@ -11,14 +11,9 @@ export class QueueCommand extends Command {
         });
     }
 
-    async run(
-        { message, guild }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, guild }: CommandContext, args: string[]): Promise<void> {
         if (args.length !== 0) {
-            await message.channel.send(
-                "Now playing command doesn't require arguments!"
-            );
+            await message.channel.send("Now playing command doesn't require arguments!");
         }
         const player = JukeBox.the().getPlayer(guild.id);
         if (!player) {

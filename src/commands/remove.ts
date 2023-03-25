@@ -1,6 +1,6 @@
 import { Command, CommandContext } from "@commands";
-import JukeBox from "@music/jukebox";
 import { italic } from "@discordjs/builders";
+import JukeBox from "@music/jukebox";
 
 export class RemoveCommand extends Command {
     constructor() {
@@ -10,10 +10,7 @@ export class RemoveCommand extends Command {
         });
     }
 
-    async run(
-        { message, guild, member }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, guild, member }: CommandContext, args: string[]): Promise<void> {
         if (args.length !== 1) {
             await message.channel.send("`!remove` takes in index of the song.");
         }
@@ -26,9 +23,7 @@ export class RemoveCommand extends Command {
 
         const index = Number.parseInt(args[0]) - 1;
         if (isNaN(index) || index < 0 || index >= player.queue.length) {
-            await message.channel.send(
-                `Queue index should be between 1-${player.queue.length}.`
-            );
+            await message.channel.send(`Queue index should be between 1-${player.queue.length}.`);
             return;
         }
 
@@ -41,9 +36,7 @@ export class RemoveCommand extends Command {
         }
 
         const video = player.remove(index);
-        const embed = video
-            .toEmbed()
-            .setTitle(`Removed ${italic(video.title)} from queue`);
+        const embed = video.toEmbed().setTitle(`Removed ${italic(video.title)} from queue`);
         await message.channel.send({ embeds: [embed] });
     }
 }

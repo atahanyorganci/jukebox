@@ -9,21 +9,14 @@ export class ResumeCommand extends Command {
         });
     }
 
-    async run(
-        { message, member, guild }: CommandContext,
-        args: string[]
-    ): Promise<void> {
+    async run({ message, member, guild }: CommandContext, args: string[]): Promise<void> {
         if (args.length !== 0) {
-            await message.channel.send(
-                "Resume command doesn't require arguments!"
-            );
+            await message.channel.send("Resume command doesn't require arguments!");
         }
         const player = JukeBox.the().getPlayer(guild.id);
 
         if (!player) {
-            await message.channel.send(
-                "Bot is not currently playing in any voice channel!"
-            );
+            await message.channel.send("Bot is not currently playing in any voice channel!");
             return;
         }
 

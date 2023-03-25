@@ -9,10 +9,10 @@ import {
     VoiceConnection,
 } from "@discordjs/voice";
 import { Video, videoToAudioResource } from "@music";
-import { VoiceChannel } from "discord.js";
-import EventEmitter from "events";
 import VideoQueue from "@music/queue";
 import { unreachable } from "@util";
+import { VoiceChannel } from "discord.js";
+import EventEmitter from "events";
 
 export enum PlayResult {
     Play,
@@ -129,8 +129,7 @@ export default class Player extends EventEmitter {
             return joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guild.id,
-                adapterCreator: channel.guild
-                    .voiceAdapterCreator as DiscordGatewayAdapterCreator,
+                adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
             });
         }
         const connection = getVoiceConnection(this.guildId);

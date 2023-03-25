@@ -1,6 +1,4 @@
-import { Client, IntentsBitField } from "discord.js";
 import { DispatcherBuilder } from "@commands";
-import { StopCommand } from "@commands/stop";
 import { InfoCommand } from "@commands/info";
 import { NowPlayingCommand } from "@commands/nowPlaying";
 import { PauseCommand } from "@commands/pause";
@@ -10,9 +8,11 @@ import { RemoveCommand } from "@commands/remove";
 import { ResumeCommand } from "@commands/resume";
 import { SearchVideoCommand } from "@commands/search";
 import { SkipCommand } from "@commands/skip";
+import { StopCommand } from "@commands/stop";
 import { VolumeCommand } from "@commands/volume";
 import { BOT_TOKEN } from "@config";
 import { logger } from "@logger";
+import { Client, IntentsBitField } from "discord.js";
 
 export const bot = new Client({
     intents: [

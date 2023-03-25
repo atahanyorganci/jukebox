@@ -1,7 +1,7 @@
-import { EmbedBuilder } from "discord.js";
-import { google } from "googleapis";
 import { API_KEY } from "@config";
 import { AudioResource, createAudioResource } from "@discordjs/voice";
+import { EmbedBuilder } from "discord.js";
+import { google } from "googleapis";
 import ytdl from "ytdl-core";
 
 export const YouTube = google.youtube({
@@ -49,13 +49,7 @@ export async function getVideoById(id: string): Promise<Video> {
     if (!channelTitle || !title || !description || !thumbnails?.default?.url) {
         throw new NoResultsError();
     }
-    return new Video(
-        id,
-        title,
-        description,
-        channelTitle,
-        thumbnails.default.url
-    );
+    return new Video(id, title, description, channelTitle, thumbnails.default.url);
 }
 
 export async function getPlaylistById(playlistId: string): Promise<Video[]> {
@@ -109,23 +103,11 @@ export async function queryVideo(query: string): Promise<Video> {
     }
 
     const { channelTitle, title, description, thumbnails } = snippet;
-    if (
-        !id?.videoId ||
-        !channelTitle ||
-        !title ||
-        !description ||
-        !thumbnails?.default?.url
-    ) {
+    if (!id?.videoId || !channelTitle || !title || !description || !thumbnails?.default?.url) {
         throw new NoResultsError();
     }
 
-    return new Video(
-        id.videoId,
-        title,
-        description,
-        channelTitle,
-        thumbnails.default.url
-    );
+    return new Video(id.videoId, title, description, channelTitle, thumbnails.default.url);
 }
 
 function parseYouTubeUrl(url: string): YouTubeResourceFragment | null {
@@ -157,9 +139,7 @@ function parseYouTubeUrl(url: string): YouTubeResourceFragment | null {
     }
 }
 
-async function fetchResourceFromUrl(
-    url: string
-): Promise<null | Video | Video[]> {
+async function fetchResourceFromUrl(url: string): Promise<null | Video | Video[]> {
     const resource = parseYouTubeUrl(url);
     if (!resource) return null;
     const { id, type } = resource;
@@ -171,9 +151,7 @@ async function fetchResourceFromUrl(
     }
 }
 
-export async function fetchYouTubeResource(
-    args: string[]
-): Promise<null | Video | Video[]> {
+export async function fetchYouTubeResource(args: string[]): Promise<null | Video | Video[]> {
     if (args.length === 1) {
         const resource = await fetchResourceFromUrl(args[0]);
         if (resource) return resource;
@@ -226,10 +204,7 @@ export class Video {
  * @param volume default volume of the resource
  * @returns AudioResource
  */
-export function videoToAudioResource(
-    video: Video,
-    volume?: number
-): AudioResource<Video> {
+export function videoToAudioResource(video: Video, volume?: number): AudioResource<Video> {
     if (volume && (volume < 0 || volume > 1)) {
         throw new Error("Volume must be greater than 0.");
     }
