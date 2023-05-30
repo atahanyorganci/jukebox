@@ -1,3 +1,4 @@
+import { expect, it } from "vitest";
 import { Video } from "~/music/index.js";
 import VideoQueue from "~/music/queue.js";
 
@@ -35,12 +36,12 @@ const VIDEOS = [
         new Video(id, title, description, channel, thumbnail)
 );
 
-test("Default queue should be empty", () => {
+it("Default queue should be empty", () => {
     const queue = new VideoQueue();
     expect(queue.isEmpty).toBeTruthy();
 });
 
-test("Queue length should 1 after adding a single video", () => {
+it("Queue length should 1 after adding a single video", () => {
     const queue = new VideoQueue();
     queue.enqueue(VIDEOS[0]);
 
@@ -48,7 +49,7 @@ test("Queue length should 1 after adding a single video", () => {
     expect(queue.length).toBe(1);
 });
 
-test("Queue length should 2 after adding two videos", () => {
+it("Queue length should 2 after adding two videos", () => {
     const queue = new VideoQueue();
     queue.enqueue(VIDEOS[0]);
     queue.enqueue(VIDEOS[1]);
@@ -57,7 +58,7 @@ test("Queue length should 2 after adding two videos", () => {
     expect(queue.length).toBe(2);
 });
 
-test("Queue length should decrease after removing a video", () => {
+it("Queue length should decrease after removing a video", () => {
     const queue = new VideoQueue();
     for (let i = 0; i < VIDEOS.length; i++) {
         queue.enqueue(VIDEOS[i]);
@@ -75,7 +76,7 @@ test("Queue length should decrease after removing a video", () => {
     expect(queue.length).toBe(0);
 });
 
-test("Queue should be empty after clearing", () => {
+it("Queue should be empty after clearing", () => {
     const queue = new VideoQueue();
     for (let i = 0; i < VIDEOS.length; i++) {
         queue.enqueue(VIDEOS[i]);

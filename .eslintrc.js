@@ -5,7 +5,7 @@ module.exports = {
         tsconfigRootDir: __dirname,
         project: ["./tsconfig.json"],
     },
-    ignorePatterns: [".eslintrc.js"],
+    ignorePatterns: [".eslintrc.js", ".prettierrc.js", "vitest.config.ts"],
     env: {
         jest: true,
     },
