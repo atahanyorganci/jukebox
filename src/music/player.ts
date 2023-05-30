@@ -11,8 +11,8 @@ import {
 import { VoiceChannel } from "discord.js";
 import EventEmitter from "events";
 import { Video, videoToAudioResource } from "~/music/index.js";
-import VideoQueue from "~/music/queue.js";
 import { unreachable } from "~/util/index.js";
+import Queue from "~/util/queue.js";
 
 export enum PlayResult {
     Play,
@@ -43,7 +43,7 @@ export class PlayerInitError extends InvalidStateError {
 export default class Player extends EventEmitter {
     private _state: PlayerState = PlayerState.Init;
     private _player: AudioPlayer | null = null;
-    private _queue: VideoQueue = new VideoQueue();
+    private _queue = new Queue<Video>();
     private _nowPlaying: AudioResource<Video> | null = null;
     private _volume = 0.25;
 
@@ -68,7 +68,7 @@ export default class Player extends EventEmitter {
         this._state = v;
     }
 
-    get queue(): VideoQueue {
+    get queue(): Queue<Video> {
         return this._queue;
     }
 
