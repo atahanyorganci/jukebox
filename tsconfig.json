@@ -10,8 +10,7 @@
             "~/*": ["./*"]
         },
         // Emit
-        "sourceMap": true,
-        "outDir": "./dist",
+        "noEmit": true,
         // Interop Constraints
         "isolatedModules": true,
         "esModuleInterop": true,
