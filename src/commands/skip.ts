@@ -1,8 +1,8 @@
-import { Command, CommandContext } from "@commands";
 import { italic } from "@discordjs/builders";
-import JukeBox from "@music/jukebox";
-import { PlayerState } from "@music/player";
-import { unreachable } from "@util";
+import { Command, CommandContext } from "~/commands/index.js";
+import JukeBox from "~/music/jukebox.js";
+import { PlayerState } from "~/music/player.js";
+import { unreachable } from "~/util/index.js";
 
 export class SkipCommand extends Command {
     constructor() {

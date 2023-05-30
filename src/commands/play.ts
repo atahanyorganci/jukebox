@@ -1,9 +1,9 @@
-import { Command, CommandContext } from "@commands";
 import { italic } from "@discordjs/builders";
-import { fetchYouTubeResource, Video } from "@music";
-import JukeBox from "@music/jukebox";
-import { PlayResult } from "@music/player";
 import { VoiceChannel } from "discord.js";
+import { Command, CommandContext } from "~/commands/index.js";
+import { fetchYouTubeResource, Video } from "~/music/index.js";
+import JukeBox from "~/music/jukebox.js";
+import { PlayResult } from "~/music/player.js";
 
 export class PlayCommand extends Command {
     constructor() {

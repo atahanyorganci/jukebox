@@ -1,6 +1,6 @@
 import { getVoiceConnection } from "@discordjs/voice";
-import Player from "@music/player";
-import { unreachable } from "@util";
+import Player from "~/music/player.js";
+import { unreachable } from "~/util/index.js";
 
 class JukeBox {
     private static _instance: JukeBox;

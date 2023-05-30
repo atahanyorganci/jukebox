@@ -1,18 +1,18 @@
-import { DispatcherBuilder } from "@commands";
-import { InfoCommand } from "@commands/info";
-import { NowPlayingCommand } from "@commands/nowPlaying";
-import { PauseCommand } from "@commands/pause";
-import { PlayCommand } from "@commands/play";
-import { QueueCommand } from "@commands/queue";
-import { RemoveCommand } from "@commands/remove";
-import { ResumeCommand } from "@commands/resume";
-import { SearchVideoCommand } from "@commands/search";
-import { SkipCommand } from "@commands/skip";
-import { StopCommand } from "@commands/stop";
-import { VolumeCommand } from "@commands/volume";
-import { BOT_TOKEN } from "@config";
-import { logger } from "@logger";
 import { Client, IntentsBitField } from "discord.js";
+import { DispatcherBuilder } from "~/commands/index.js";
+import { InfoCommand } from "~/commands/info.js";
+import { NowPlayingCommand } from "~/commands/nowPlaying.js";
+import { PauseCommand } from "~/commands/pause.js";
+import { PlayCommand } from "~/commands/play.js";
+import { QueueCommand } from "~/commands/queue.js";
+import { RemoveCommand } from "~/commands/remove.js";
+import { ResumeCommand } from "~/commands/resume.js";
+import { SearchVideoCommand } from "~/commands/search.js";
+import { SkipCommand } from "~/commands/skip.js";
+import { StopCommand } from "~/commands/stop.js";
+import { VolumeCommand } from "~/commands/volume.js";
+import { BOT_TOKEN } from "~/config.js";
+import { logger } from "~/logger.js";
 
 export const bot = new Client({
     intents: [

@@ -1,7 +1,7 @@
-import { Command, CommandContext } from "@commands";
 import { bold, italic } from "@discordjs/builders";
-import JukeBox from "@music/jukebox";
 import { EmbedBuilder } from "discord.js";
+import { Command, CommandContext } from "~/commands/index.js";
+import JukeBox from "~/music/jukebox.js";
 
 export class QueueCommand extends Command {
     constructor() {

@@ -1,6 +1,6 @@
-import { Command, CommandContext } from "@commands";
 import { italic } from "@discordjs/builders";
-import JukeBox from "@music/jukebox";
+import { Command, CommandContext } from "~/commands/index.js";
+import JukeBox from "~/music/jukebox.js";
 
 export class NowPlayingCommand extends Command {
     constructor() {

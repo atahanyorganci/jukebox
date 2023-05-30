@@ -8,11 +8,11 @@ import {
     joinVoiceChannel,
     VoiceConnection,
 } from "@discordjs/voice";
-import { Video, videoToAudioResource } from "@music";
-import VideoQueue from "@music/queue";
-import { unreachable } from "@util";
 import { VoiceChannel } from "discord.js";
 import EventEmitter from "events";
+import { Video, videoToAudioResource } from "~/music/index.js";
+import VideoQueue from "~/music/queue.js";
+import { unreachable } from "~/util/index.js";
 
 export enum PlayResult {
     Play,

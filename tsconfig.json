@@ -1,14 +1,33 @@
 {
-    "extends": "@tsconfig/node16/tsconfig.json",
     "compilerOptions": {
-        "outDir": "./dist/",
-        "sourceMap": true,
+        "incremental": true,
+        "tsBuildInfoFile": "./dist/.tsbuildinfo",
+        "target": "ESNext",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "baseUrl": "./src/",
         "paths": {
-            "@*": ["./*"]
+            "~/*": ["./*"]
         },
-        "target": "ES2020",
-        "plugins": [{ "transform": "typescript-transform-paths" }]
+        // Emit
+        "sourceMap": true,
+        "outDir": "./dist",
+        // Interop Constraints
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        // Type Checking
+        "strict": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": true,
+        "useUnknownInCatchVariables": true,
+        "noImplicitReturns": true,
+        // Completeness
+        "skipLibCheck": true
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "**/*.d.ts"]

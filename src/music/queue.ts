@@ -1,4 +1,4 @@
-import { Video } from "@music";
+import { Video } from "~/music/index.js";
 
 export default class VideoQueue {
     private _queue: Video[] = [];

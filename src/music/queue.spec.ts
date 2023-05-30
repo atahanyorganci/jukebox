@@ -1,5 +1,5 @@
-import { Video } from "@music";
-import VideoQueue from "@music/queue";
+import { Video } from "~/music/index.js";
+import VideoQueue from "~/music/queue.js";
 
 const VIDEOS = [
     {

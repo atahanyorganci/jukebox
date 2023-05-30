@@ -1,8 +1,8 @@
-import { API_KEY } from "@config";
 import { AudioResource, createAudioResource } from "@discordjs/voice";
 import { EmbedBuilder } from "discord.js";
 import { google } from "googleapis";
 import ytdl from "ytdl-core";
+import { API_KEY } from "~/config.js";
 
 export const YouTube = google.youtube({
     version: "v3",

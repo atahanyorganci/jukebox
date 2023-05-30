@@ -1,5 +1,5 @@
-import { Command, CommandContext } from "@commands";
-import JukeBox from "@music/jukebox";
+import { Command, CommandContext } from "~/commands/index.js";
+import JukeBox from "~/music/jukebox.js";
 
 export class PauseCommand extends Command {
     constructor() {

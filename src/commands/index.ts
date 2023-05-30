@@ -1,7 +1,7 @@
-import { PREFIX } from "@config";
 import { inlineCode } from "@discordjs/builders";
-import { logger } from "@logger";
 import { APIEmbed, Client, EmbedBuilder, Guild, GuildMember, Message } from "discord.js";
+import { PREFIX } from "~/config.js";
+import { logger } from "~/logger.js";
 
 export interface CommandOptions {
     name: string;

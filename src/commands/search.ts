@@ -1,5 +1,5 @@
-import { Command, CommandContext } from "@commands";
-import { queryVideo } from "../music";
+import { Command, CommandContext } from "~/commands/index.js";
+import { queryVideo } from "~/music/index.js";
 
 export class SearchVideoCommand extends Command {
     constructor() {

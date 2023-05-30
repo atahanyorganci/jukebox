@@ -1,6 +1,6 @@
-import { logger } from "@logger";
 import dotenv from "dotenv";
 import { z } from "zod";
+import { logger } from "~/logger.js";
 
 const botConfigSchema = z.object({
     API_KEY: z.string(),
