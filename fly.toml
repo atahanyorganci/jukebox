@@ -1,9 +1,11 @@
 app = "jukebox"
 kill_signal = "SIGINT"
 kill_timeout = 5
-processes = []
+
+[build]
+  dockerfile = "Dockerfile"
+  ignorefile = ".dockerignore"
+  build-target = "bot"
 
 [env]
   PREFIX = "!"
-
-[[services]]
