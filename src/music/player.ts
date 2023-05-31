@@ -7,6 +7,7 @@ import {
     getVoiceConnection,
     joinVoiceChannel,
     VoiceConnection,
+    VoiceConnectionStatus,
 } from "@discordjs/voice";
 import { VoiceChannel } from "discord.js";
 import EventEmitter from "events";
@@ -126,11 +127,20 @@ export default class Player extends EventEmitter {
 
     private getVoiceConnection(channel: VoiceChannel): VoiceConnection {
         if (this.state === PlayerState.Init) {
-            return joinVoiceChannel({
+            const connection = joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guild.id,
                 adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
             });
+            connection.on("stateChange", (oldState, newState) => {
+                if (
+                    oldState.status === VoiceConnectionStatus.Ready &&
+                    newState.status === VoiceConnectionStatus.Connecting
+                ) {
+                    connection.configureNetworking();
+                }
+            });
+            return connection;
         }
         const connection = getVoiceConnection(this.guildId);
         if (!connection) {
