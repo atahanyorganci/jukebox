@@ -23,4 +23,8 @@ await esbuild.build({
     sourcemap: isDevelopment,
     minify: !isDevelopment,
     external: [...dependencies, ...devDependencies],
+    define: {
+        DEBUG: JSON.stringify(isDevelopment),
+        VERSION: JSON.stringify(pkg.version || "0.0.0"),
+    },
 });

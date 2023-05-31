@@ -37,7 +37,7 @@ const handler = new DispatcherBuilder()
     .register(new VolumeCommand())
     .build();
 bot.once("ready", () => {
-    logger.info("Bot is ready.");
+    logger.info(`Bot is ready, version ${VERSION}`);
 });
 bot.on("messageCreate", async msg => {
     await handler.handle(bot, msg);
