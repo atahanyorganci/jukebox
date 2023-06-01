@@ -1,13 +1,8 @@
 import { AudioResource, createAudioResource } from "@discordjs/voice";
 import { EmbedBuilder } from "discord.js";
-import { google } from "googleapis";
 import ytdl from "ytdl-core";
+import { z } from "zod";
 import { API_KEY } from "~/config.js";
-
-export const YouTube = google.youtube({
-    version: "v3",
-    auth: API_KEY,
-});
 
 interface YouTubeResourceFragment {
     type: "video" | "playlist";
@@ -32,82 +27,178 @@ export class NoResultsError extends Error {
     }
 }
 
+const YouTubeThumbnailSchema = z.object({
+    url: z.string(),
+    width: z.number(),
+    height: z.number(),
+});
+
+const VideoSchema = z
+    .object({
+        id: z.object({
+            videoId: z.string(),
+        }),
+        snippet: z.object({
+            title: z.string(),
+            description: z.string(),
+            thumbnails: z.object({
+                default: YouTubeThumbnailSchema,
+            }),
+            publishedAt: z
+                .string()
+                .datetime()
+                .transform(date => new Date(date)),
+            channelTitle: z.string(),
+        }),
+    })
+    .transform(
+        ({
+            id: { videoId: id },
+            snippet: { title, description, thumbnails, publishedAt, channelTitle: channel },
+        }) => ({
+            id,
+            channel,
+            title,
+            description,
+            thumbnail: thumbnails.default.url,
+            publishedAt,
+        })
+    );
+
+const YouTubeSearchListSchema = z.object({
+    kind: z.string(),
+    etag: z.string(),
+    items: z.array(VideoSchema).optional(),
+});
+
+const YouTubeVideoListSchema = z.object({
+    kind: z.string(),
+    etag: z.string(),
+    items: z
+        .array(
+            z
+                .object({
+                    id: z.string(),
+                    snippet: z.object({
+                        title: z.string(),
+                        description: z.string(),
+                        thumbnails: z.object({
+                            default: YouTubeThumbnailSchema,
+                        }),
+                        channelTitle: z.string(),
+                        publishedAt: z
+                            .string()
+                            .datetime()
+                            .transform(date => new Date(date)),
+                    }),
+                })
+                .transform(
+                    ({
+                        id,
+                        snippet: { title, description, thumbnails, channelTitle, publishedAt },
+                    }) => ({
+                        id,
+                        title,
+                        description,
+                        thumbnail: thumbnails.default.url,
+                        channel: channelTitle,
+                        publishedAt,
+                    })
+                )
+        )
+        .optional(),
+});
+
+const YouTubePlaylistListSchema = z.object({
+    kind: z.string(),
+    etag: z.string(),
+    items: z
+        .array(
+            z
+                .object({
+                    snippet: z.object({
+                        title: z.string(),
+                        description: z.string(),
+                        thumbnails: z.object({
+                            default: YouTubeThumbnailSchema,
+                        }),
+                        channelTitle: z.string(),
+                        publishedAt: z
+                            .string()
+                            .datetime()
+                            .transform(date => new Date(date)),
+                    }),
+                    contentDetails: z.object({
+                        videoId: z.string(),
+                    }),
+                })
+                .transform(
+                    ({
+                        contentDetails: { videoId: id },
+                        snippet: { title, description, thumbnails, channelTitle, publishedAt },
+                    }) => ({
+                        id,
+                        title,
+                        description,
+                        thumbnail: thumbnails.default.url,
+                        channel: channelTitle,
+                        publishedAt,
+                    })
+                )
+        )
+        .optional(),
+});
+
 export async function getVideoById(id: string): Promise<Video> {
-    const { data } = await YouTube.videos.list({
-        id: [id],
-        part: ["snippet"],
-    });
-    if (!data.items || data.items.length === 0) {
-        throw new NoResultsError();
-    }
-    const { snippet } = data.items[0];
-    if (!snippet) {
+    const url = new URL("https://www.googleapis.com/youtube/v3/videos");
+    url.searchParams.set("id", id);
+    url.searchParams.set("part", "snippet");
+    url.searchParams.set("key", API_KEY);
+    url.searchParams.set("maxResults", "1");
+
+    const response = await fetch(url);
+    const result = YouTubeVideoListSchema.safeParse(await response.json());
+    if (!result.success || !result.data.items || result.data.items.length === 0) {
         throw new NoResultsError();
     }
 
-    const { channelTitle, title, description, thumbnails } = snippet;
-    if (!channelTitle || !title || !description || !thumbnails?.default?.url) {
-        throw new NoResultsError();
-    }
-    return new Video(id, title, description, channelTitle, thumbnails.default.url);
+    const { channel, title, description, thumbnail } = result.data.items[0];
+    return new Video(id, title, description, channel, thumbnail);
 }
 
 export async function getPlaylistById(playlistId: string): Promise<Video[]> {
-    const { data } = await YouTube.playlistItems.list({
-        playlistId,
-        part: ["contentDetails", "snippet"],
-        maxResults: 25,
-    });
-    if (!data.items || data.items.length === 0) {
+    const url = new URL("https://www.googleapis.com/youtube/v3/playlistItems");
+    url.searchParams.set("playlistId", playlistId);
+    url.searchParams.set("part", "snippet,contentDetails");
+    url.searchParams.set("key", API_KEY);
+
+    const response = await fetch(url);
+    const result = YouTubePlaylistListSchema.safeParse(await response.json());
+    if (!result.success || !result.data.items || result.data.items.length === 0) {
         throw new NoResultsError();
     }
-    const videos = data.items.map(item => {
-        const { contentDetails, snippet } = item;
-        if (!snippet || !contentDetails) {
-            throw new NoResultsError();
-        }
-        const { channelTitle, title, description, thumbnails } = snippet;
-        if (
-            !contentDetails.videoId ||
-            !channelTitle ||
-            !title ||
-            !description ||
-            !thumbnails?.default?.url
-        ) {
-            throw new NoResultsError();
-        }
-        return new Video(
-            contentDetails.videoId,
-            title,
-            description,
-            channelTitle,
-            thumbnails.default.url
-        );
+
+    const playlist = result.data.items.map(({ id, channel, title, description, thumbnail }) => {
+        return new Video(id, title, description, channel, thumbnail);
     });
-    return videos;
+    return playlist;
 }
 
 export async function queryVideo(query: string): Promise<Video> {
-    const list = await YouTube.search.list({
-        part: ["id", "snippet"],
-        maxResults: 1,
-        q: query,
-    });
-    if (!list.data.items || list.data.items.length === 0) {
+    const url = new URL("https://www.googleapis.com/youtube/v3/search");
+    url.searchParams.set("part", "snippet");
+    url.searchParams.set("maxResults", "1");
+    url.searchParams.set("key", API_KEY);
+    url.searchParams.set("q", query);
+
+    const response = await fetch(url);
+    const result = YouTubeSearchListSchema.safeParse(await response.json());
+    if (!result.success || !result.data.items || result.data.items.length === 0) {
         throw new NoResultsError();
     }
 
-    const { id, snippet } = list.data.items[0];
-    if (!id || !snippet) {
-        throw new NoResultsError();
-    }
-
-    const { channelTitle, title, description, thumbnails } = snippet;
-    if (!id?.videoId || !channelTitle || !title || !description || !thumbnails?.default?.url) {
-        throw new NoResultsError();
-    }
-
-    return new Video(id.videoId, title, description, channelTitle, thumbnails.default.url);
+    const { id, channel, title, description, thumbnail } = result.data.items[0];
+    return new Video(id, title, description, channel, thumbnail);
 }
 
 function parseYouTubeUrl(url: string): YouTubeResourceFragment | null {
